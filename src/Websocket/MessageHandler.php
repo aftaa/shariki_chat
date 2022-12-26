@@ -21,14 +21,13 @@ readonly class MessageHandler implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        foreach($this->connections as $connection)
-        {
-            if($connection === $from)
-            {
-                continue;
-            }
-            $connection->send($msg);
-        }
+//        foreach ($this->connections as $connection) {
+//            if ($connection === $from) {
+//                continue;
+//            }
+//            $connection->send($msg);
+//        }
+        $from->send($msg);
     }
 
     public function onClose(ConnectionInterface $conn)
