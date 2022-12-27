@@ -13,9 +13,9 @@ use Ratchet\MessageComponentInterface;
 readonly class MessageHandler implements MessageComponentInterface
 {
     public function __construct(
-        private \SplObjectStorage $connections = new \SplObjectStorage(),
         private SessionRepository $sessionRepository,
         private ChatRepository $chatRepository,
+        private \SplObjectStorage $connections = new \SplObjectStorage(),
     )
     {
     }
@@ -33,7 +33,7 @@ readonly class MessageHandler implements MessageComponentInterface
 //            }
 //            $connection->send($msg);
 //        }
-        $message = json_decode($msg);
+        $message = json_decode($msg, true);
         $sessionKey = $message['session'];
 
         $session = $this->sessionRepository->findBy(['key' => $sessionKey]);
