@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Manager\ChatManager;
 use App\Repository\ChatRepository;
 use App\Repository\SessionRepository;
 use App\Websocket\MessageHandler;
@@ -21,11 +22,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class WebsocketServerCommand extends Command
 {
-
-
     public function __construct(
-        private readonly SessionRepository $sessionRepository,
-        private readonly ChatRepository    $chatRepository,
+        private readonly ChatManager $chatManager,
     )
     {
         parent::__construct();
@@ -39,8 +37,8 @@ class WebsocketServerCommand extends Command
             new HttpServer(
                 new WsServer(
                     new MessageHandler(
-                        $this->sessionRepository,
-                        $this->chatRepository,
+                        $this->chatManager,
+                        $output,
                     )
                 )
             ),
