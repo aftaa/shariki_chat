@@ -17,7 +17,7 @@ class Session
     private ?int $id = null;
 
     #[ORM\Column(length: 32)]
-    private ?string $key = null;
+    private ?string $name = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $session_started = null;
@@ -38,14 +38,14 @@ class Session
         return $this->id;
     }
 
-    public function getKey(): ?string
+    public function getName(): ?string
     {
-        return $this->key;
+        return $this->name;
     }
 
-    public function setKey(string $key): self
+    public function setName(string $name): self
     {
-        $this->key = $key;
+        $this->name = $name;
 
         return $this;
     }

@@ -22,6 +22,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class WebsocketServerCommand extends Command
 {
+    const PORT = 3001;
+
     public function __construct(
         private readonly ChatManager $chatManager,
     )
@@ -32,9 +34,9 @@ class WebsocketServerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+        ini_set('display_errors', '1');
 
-        $port = 3001;
-        $output->writeln("Starting server on port " . $port);
+        $output->writeln("Starting server on port " . self::PORT);
         $server = IoServer::factory(
             new HttpServer(
                 new WsServer(
@@ -44,7 +46,7 @@ class WebsocketServerCommand extends Command
                     )
                 )
             ),
-            $port
+            self::PORT,
         );
         $server->run();
         return Command::SUCCESS;

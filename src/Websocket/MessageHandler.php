@@ -25,22 +25,26 @@ readonly class MessageHandler implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        $message = json_decode($msg);
-        $this->output->writeln('Received message; command=' . $message->command);
+        try {
+            $message = json_decode($msg);
+            $this->output->writeln('Received message; command=' . $message->command);
 
-        $session = $this->chatManager->getSession($message->session);
+            $session = $this->chatManager->getSession($message->session);
 
-        switch ($message->command) {
-            case 'get_history':
-                $answer = (object)[
-                    'name' => 'Оператор',
-                    'message' => 'Здравствуйте!',
-                    'session' => $message->session,
-                ];
+            switch ($message->command) {
+                case 'get_history':
+                    $answer = (object)[
+                        'name' => 'Оператор',
+                        'message' => 'Здравствуйте!',
+                        'session' => $message->session,
+                    ];
 
-                $msg = json_encode($answer);
-                $from->send($msg);
-                break;
+                    $msg = json_encode($answer);
+                    $from->send($msg);
+                    break;
+            }
+        } catch (\Exception $exception) {
+            $this->output->writeln($exception->getMessage());
         }
     }
 
