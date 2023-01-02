@@ -28,7 +28,7 @@ readonly class MessageHandler implements MessageComponentInterface
         $message = json_decode($msg);
         $this->output->writeln('Received message; command=' . $message->command);
 
-//        $session = $this->chatManager->getSession($message->session);
+        $session = $this->chatManager->getSession($message->session);
 
         switch ($message->command) {
             case 'get_history':

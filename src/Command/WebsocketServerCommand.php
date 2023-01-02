@@ -31,6 +31,8 @@ class WebsocketServerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
         $port = 3001;
         $output->writeln("Starting server on port " . $port);
         $server = IoServer::factory(
