@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Session;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -63,4 +64,16 @@ class SessionRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function getSession(string $sessionKey): ?Session
+    {
+        return $this
+            ->createQueryBuilder('s')
+            ->where('s.name = :sessionKey')
+            ->setParameter(':sessionKey', $sessionKey)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

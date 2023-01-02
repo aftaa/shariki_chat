@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Chat;
+use App\Entity\Session;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -63,4 +64,17 @@ class ChatRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+    /**
+     * @param Session $session
+     * @return Chat[]
+     */
+    public function getChats(Session $session): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        $qb->where('c.session = :session')
+            ->orderBy('c.created', 'ASC')
+            ->setParameter(':session', $session);
+        $query = $qb->getQuery();
+        return $query->execute();
+    }
 }

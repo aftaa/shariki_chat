@@ -2,6 +2,7 @@
 
 namespace App\Websocket;
 
+use App\Chat\Message;
 use App\Manager\ChatManager;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -33,14 +34,30 @@ readonly class MessageHandler implements MessageComponentInterface
 
             switch ($message->command) {
                 case 'get_history':
-                    $answer = (object)[
-                        'name' => 'Оператор',
-                        'message' => 'Здравствуйте!',
-                        'session' => $message->session,
-                    ];
-
-                    $msg = json_encode($answer);
-                    $from->send($msg);
+                    $this->output->writeln('Found messages: ' . count($session->getChats()));
+                    if (count($session->getChats())) {
+                        $chats = $this->chatManager->getChats($session);
+                        foreach ($chats as $chat) {
+                            $message = new Message(
+                                name: $chat->getName() . '1',
+                                message: $chat->getMessage(),
+                                session: $chat->getSession(),
+                                isOperator: $chat->isIsOperator(),
+                            );
+                            $msg = json_encode($message);
+                            $from->send($msg);
+                        }
+                    } else {
+                        $answer = new Message(
+                            name: 'Чат-бот',
+                            message: 'Здравствуйте!',
+                            session: $message->session,
+                            isOperator: true,
+                        );
+                        $this->chatManager->addMessage($session, $answer);
+                        $msg = json_encode($answer);
+                        $from->send($msg);
+                    }
                     break;
             }
         } catch (\Exception $exception) {
