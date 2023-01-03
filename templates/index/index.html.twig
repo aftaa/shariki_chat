@@ -7,26 +7,82 @@
         body {
             font: 15px/17px Arial, sans-serif;
         }
+
         aside {
             width: 300px;
             float: left;
-            border-right: 1px solid #000;
-            border-bottom: 1px solid #000;
+            border-right: 1px solid #fff;
+            border-bottom: 1px solid #fff;
             height: 100%;
         }
+
         #status {
             font-weight: bold;
             color: red;
         }
+
         header {
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid #fff;
         }
+
         .session {
-            border-bottom: 1px solid #000;
+            border-bottom: 1px solid #fff;
             padding: 5px;
         }
-        #empty-session {
-            border: none;
+
+        main {
+            margin-left: 300px;
+            width: 700px;
+            border-left: 1px solid #fff;
+            border-right: 1px solid #fff;
+        }
+
+        .chat {
+            border-bottom: 1px solid #fff;
+            overflow: hidden;
+        }
+
+        .messages {
+            display: none;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 5px;
+            clear: both;
+            background: #eee;
+            border-radius: 10px;
+            float: left;
+            max-width: 90%;
+        }
+
+        .message.operator {
+            background: #22ceb6;
+            color: #fff;
+            float: right;
+        }
+
+        .chat-form {
+            padding: 3px;
+            border-bottom: 1px solid #fff;
+        }
+
+        .chat-form input {
+            width: 630px;
+            line-height: 30px;
+        }
+
+        .chat-form button {
+            width: 39px;
+            height: 39px;
+            background: #22ceb6;
+            color: #fff;
+            border: 1px solid #fff;
+            font-size: 23px;
+            line-height: 33px;
+            font-weight: bold;
+            border-radius: 17px;
+            cursor: pointer;
         }
     </style>
 
@@ -34,13 +90,9 @@
         <div id="status">DISCONNECTED</div>
     </header>
 
-    <aside>
-        <span class="session" id="empty-session"></span>
-    </aside>
+    <aside></aside>
 
-    <main>
-
-    </main>
+    <main></main>
 
     {% if local %}
         <script>const socket = new WebSocket("ws://localhost:3001");</script>
@@ -57,20 +109,103 @@
             socket.send(JSON.stringify(command));
         });
 
+        function queryMessages(session) {
+            const command = {
+                command: 'get_op_history',
+                session: session
+            };
+            socket.send(JSON.stringify(command));
+        }
+
         socket.addEventListener("message", function (e) {
             const message = JSON.parse(e.data);
             switch (message.type) {
                 case 'session':
                     addSession(message.session);
+                    queryMessages(message.session.name);
                     break;
+                default:
+                    addMessage(message);
             }
         });
 
+        function addMessage(message) {
+            let $box = createMessageBox(message.session);
+            let classes = "message";
+            if (message.isOperator) {
+                classes += " operator";
+            }
+            $box.append('<div class="' + classes + '">' + message.message + '</div>');
+        }
+
+        function createMessageBox(session) {
+            if (!$('#chat-' + session).length) {
+
+                $('main').append('<div class="messages" id="messages-' + session + '"></div>');
+                $('#messages-' + session).append('<div class="chat" id="chat-' + session + '"></div>');
+                let form = '<div class="chat-form" data-session=" + session + " id="form-' + session + '">'
+                    + '    <label>'
+                    + '        <input type="text" placeholder="Напишите и нажмите Enter">'
+                    + '    </label>'
+                    + '    <button>&gt;</button>'
+                    + '</div>';
+                $('#messages-' + session).append(form);
+                formEventListener(session);
+            }
+
+            $('#messages-' + session).height(window.innerHeight);
+
+            return $('#chat-' + session);
+        }
+
         function addSession(session) {
-            let html = '<div class="session"><b>' + session.id + '</b><br><span class="started">'
-                + session.started + '</span><br><a href="#' + session.id + '">перейти к диалогу</a>'
+            let html = '<div class="session" id="session-' + session.name
+                + '"><b>' + session.id + '</b><br><span class="started">'
+                + session.started + '</span><br><a href=""'
+                + ' data-chat="#messages-' + session.name + '" data-session="'
+                + session.name + '">перейти к диалогу</a>'
                 + '<br><i><small>' + session.name + '</small></i></div>';
-            $('aside .session:last').after(html);
+            $('aside').append(html);
+            anchorEventListener(session);
+        }
+
+        function anchorEventListener(session) {
+            $('#session-' + session.name + '  a').on('click', function (event) {
+                event.preventDefault();
+                let target = this.dataset.chat;
+                let session = this.dataset.session;
+                queryMessages()
+                $('.messages').hide();
+                $(target).show();
+            })
+        }
+
+        function formEventListener(session) {
+            $('#form-' + session + ' input').on('keypress', function (event) {
+                if (13 === event.keyCode && $.trim(this.value)) {
+                    let message = this.value;
+                    this.value = '';
+                    sendMessage(message, session);
+                }
+            });
+            $('#form-' + session + ' button').on('click', function (event) {
+                let message = $('#form-' + session + ' input').val();
+                if ($.trim(message)) {
+                    $('#form-' + session + ' input').val('');
+                    sendMessage(message, session);
+                }
+            });
+        }
+
+        function sendMessage(text, session) {
+            const message = {
+                command: 'add_op_message',
+                session: session,
+                message: text,
+                name: 'Оператор',
+                isOperator: true
+            };
+            socket.send(JSON.stringify(message));
         }
 
         socket.addEventListener("close", function () {

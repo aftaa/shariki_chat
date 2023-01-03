@@ -9,13 +9,20 @@ use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-readonly class MessageHandler implements MessageComponentInterface
+class MessageHandler implements MessageComponentInterface
 {
+    private ConnectionInterface $operator;
+    /**
+     * @var ConnectionInterface[]
+     */
+    private array $sessions = [];
+
+
     public function __construct(
-        private ChatManager       $chatManager,
-        private OperatorManager   $operatorManager,
-        private OutputInterface   $output,
-        private \SplObjectStorage $connections = new \SplObjectStorage(),
+        private readonly ChatManager       $chatManager,
+        private readonly OperatorManager   $operatorManager,
+        private readonly OutputInterface   $output,
+        private readonly \SplObjectStorage $connections = new \SplObjectStorage(),
     )
     {
     }
@@ -33,7 +40,20 @@ readonly class MessageHandler implements MessageComponentInterface
             $this->output->writeln('Received message; command=' . $message->command);
 
             switch ($message->command) {
+                case 'add_op_message':
+                    $this->operator = $from;
+                    $message = json_decode($msg);
+                    $session = $this->chatManager->getSession($message->session);
+                    $message->session = $session;
+                    $this->chatManager->addMessage($session, $message);
+                    $from->send($msg);
+                    if (array_key_exists($session->getName(), $this->sessions)) {
+                        $this->sessions[$session->getName()]->send($msg);
+                    }
+                    break;
                 case 'get_sessions':
+                    $this->operator = $from;
+
                     $sessions = $this->operatorManager->getSessions();
                     $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
                     foreach ($sessions as $session) {
@@ -50,6 +70,9 @@ readonly class MessageHandler implements MessageComponentInterface
                     }
                     break;
                 case 'get_history':
+                    $session = $this->chatManager->getSession($message->session);
+                    $this->sessions[$session->getName()] = $from;
+                case 'get_op_history':
                     $session = $this->chatManager->getSession($message->session);
                     $chats = $this->chatManager->getChats($session);
                     $this->output->writeln('Found messages: ' . count($chats));
@@ -78,11 +101,18 @@ readonly class MessageHandler implements MessageComponentInterface
                     break;
                 case 'add_message':
                     $session = $this->chatManager->getSession($message->session);
+                    $this->sessions[$session->getName()] = $from;
+
                     $message = json_decode($msg);
                     $message->isOperator = false;
                     $message->session = $session;
                     $this->chatManager->addMessage($session, $message);
                     $from->send($msg);
+                    if ($this->operator) {
+                        if (!$this->operator->send($msg)) {
+                            $this->operator = null;
+                        }
+                    }
             }
         } catch (\Exception $exception) {
             $this->output->writeln($exception->getMessage());
