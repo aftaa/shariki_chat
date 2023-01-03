@@ -108,7 +108,7 @@ class MessageHandler implements MessageComponentInterface
                     $message->session = $session;
                     $this->chatManager->addMessage($session, $message);
                     $from->send($msg);
-                    if ($this->operator) {
+                    if (!is_null($this->operator)) {
                         if (!$this->operator->send($msg)) {
                             $this->operator = null;
                         }
