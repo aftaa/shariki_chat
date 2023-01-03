@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MessageHandler implements MessageComponentInterface
 {
-    private ConnectionInterface $operator;
+    private ?ConnectionInterface $operator = null;
     /**
      * @var ConnectionInterface[]
      */
