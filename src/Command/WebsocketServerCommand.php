@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Manager\ChatManager;
+use App\Manager\OperatorManager;
 use App\Repository\ChatRepository;
 use App\Repository\SessionRepository;
 use App\Websocket\MessageHandler;
@@ -25,7 +26,8 @@ class WebsocketServerCommand extends Command
     const PORT = 3001;
 
     public function __construct(
-        private readonly ChatManager $chatManager,
+        private readonly ChatManager     $chatManager,
+        private readonly OperatorManager $operatorManager,
     )
     {
         parent::__construct();
@@ -42,6 +44,7 @@ class WebsocketServerCommand extends Command
                 new WsServer(
                     new MessageHandler(
                         $this->chatManager,
+                        $this->operatorManager,
                         $output,
                     )
                 )

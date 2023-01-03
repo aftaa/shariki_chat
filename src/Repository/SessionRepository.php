@@ -2,9 +2,12 @@
 
 namespace App\Repository;
 
+use App\Entity\Chat;
 use App\Entity\Session;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -75,5 +78,24 @@ class SessionRepository extends ServiceEntityRepository
             ->setParameter(':sessionKey', $sessionKey)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getSessions(): array
+    {
+//        $this->getEntityManager()->getConnection()->executeQuery(
+//            'SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))',
+//        );
+
+        return $this
+            ->createQueryBuilder('s')
+//            ->select('s.id AS id, s.name AS session, c.created AS last_message')
+//            ->join(Chat::class, 'c', Join::ON)
+//            ->orderBy('c.created', 'DESC')
+//            ->groupBy('s.id')
+            ->getQuery()
+            ->execute();
     }
 }

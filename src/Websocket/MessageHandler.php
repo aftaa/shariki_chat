@@ -4,6 +4,7 @@ namespace App\Websocket;
 
 use App\Chat\Message;
 use App\Manager\ChatManager;
+use App\Manager\OperatorManager;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,6 +13,7 @@ readonly class MessageHandler implements MessageComponentInterface
 {
     public function __construct(
         private ChatManager       $chatManager,
+        private OperatorManager   $operatorManager,
         private OutputInterface   $output,
         private \SplObjectStorage $connections = new \SplObjectStorage(),
     )
@@ -30,10 +32,22 @@ readonly class MessageHandler implements MessageComponentInterface
             $message = json_decode($msg);
             $this->output->writeln('Received message; command=' . $message->command);
 
-            $session = $this->chatManager->getSession($message->session);
-
             switch ($message->command) {
+                case 'get_sessions':
+//                    $sessions = $this->operatorManager->getSessions();
+                    $sessions = $this->operatorManager->sessionRepository->findAll();
+                    $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
+                    foreach ($sessions as $session) {
+                        $msg = (object)[
+                            'type' => 'session',
+                            'session' => $session,
+                        ];
+                        $msg = json_encode($msg);
+                        $from->send($msg);
+                    }
+                    break;
                 case 'get_history':
+                    $session = $this->chatManager->getSession($message->session);
                     $chats = $this->chatManager->getChats($session);
                     $this->output->writeln('Found messages: ' . count($chats));
                     if (count($chats)) {
@@ -60,6 +74,7 @@ readonly class MessageHandler implements MessageComponentInterface
                     }
                     break;
                 case 'add_message':
+                    $session = $this->chatManager->getSession($message->session);
                     $message = json_decode($msg);
                     $message->isOperator = false;
                     $message->session = $session;

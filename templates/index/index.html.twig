@@ -1,6 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Чат{% endblock %}
+{% block title %}Чаты{% endblock %}
 
 {% block body %}
+    <style>
+        aside {
+            width: 300px;
+            float: left;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            height: 100%;
+        }
+    </style>
+
+    <header>
+        <div id="status"></div>
+    </header>
+
+    <aside>
+
+    </aside>
+
+    <main>
+
+    </main>
+
+    {% if local %}
+        <script>const socket = new WebSocket("ws://localhost:3001");</script>
+    {% else %}
+        <script>const socket = new WebSocket("wss://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai:3002");</script>
+    {% endif %}
+
+    <script>
+        socket.addEventListener("open", function () {
+            ("CONNECTED");
+            const command = {
+                command: 'get_sessions'
+            };
+            socket.send(JSON.stringify(command));
+        });
+
+        socket.addEventListener("message", function (e) {
+            const message = JSON.parse(e.data);
+            switch (message.type) {
+                case 'session':
+                    addSession(message.session);
+                    break;
+            }
+        });
+
+        function addSession(session) {
+            console.log(session.name);
+        }
+
+    </script>
 {% endblock %}
