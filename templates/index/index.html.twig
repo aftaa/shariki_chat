@@ -4,6 +4,9 @@
 
 {% block body %}
     <style>
+        body {
+            font: 15px/17px Arial, sans-serif;
+        }
         aside {
             width: 300px;
             float: left;
@@ -11,14 +14,28 @@
             border-bottom: 1px solid #000;
             height: 100%;
         }
+        #status {
+            font-weight: bold;
+            color: red;
+        }
+        header {
+            border-bottom: 1px solid #000;
+        }
+        .session {
+            border-bottom: 1px solid #000;
+            padding: 5px;
+        }
+        #empty-session {
+            border: none;
+        }
     </style>
 
     <header>
-        <div id="status"></div>
+        <div id="status">DISCONNECTED</div>
     </header>
 
     <aside>
-
+        <span class="session" id="empty-session"></span>
     </aside>
 
     <main>
@@ -33,7 +50,7 @@
 
     <script>
         socket.addEventListener("open", function () {
-            ("CONNECTED");
+            $('#status').html("CONNECTED");
             const command = {
                 command: 'get_sessions'
             };
@@ -50,8 +67,15 @@
         });
 
         function addSession(session) {
-            console.log(session.name);
+            let html = '<div class="session"><b>' + session.id + '</b><br><span class="started">'
+                + session.started + '</span><br><a href="#' + session.id + '">перейти к диалогу</a>'
+                + '<br><i><small>' + session.name + '</small></i></div>';
+            $('aside .session:last').after(html);
         }
+
+        socket.addEventListener("close", function () {
+            $('#status').html("DISCONNECTED");
+        });
 
     </script>
 {% endblock %}

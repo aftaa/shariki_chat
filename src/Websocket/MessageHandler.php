@@ -34,15 +34,18 @@ readonly class MessageHandler implements MessageComponentInterface
 
             switch ($message->command) {
                 case 'get_sessions':
-//                    $sessions = $this->operatorManager->getSessions();
-                    $sessions = $this->operatorManager->sessionRepository->findAll();
+                    $sessions = $this->operatorManager->getSessions();
                     $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
                     foreach ($sessions as $session) {
                         $msg = (object)[
                             'type' => 'session',
-                            'session' => $session,
+                            'session' => [
+                                'name' => $session->getName(),
+                                'id' => $session->getId(),
+                                'started' => $session->getSessionStarted()->format('d.m.y H:i'),
+                            ],
                         ];
-                        $msg = json_encode($msg);
+                        $msg = json_encode($msg, JSON_FORCE_OBJECT);
                         $from->send($msg);
                     }
                     break;
