@@ -73,7 +73,8 @@ class ChatRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c');
         $qb->where('c.session = :session')
             ->orderBy('c.created', 'ASC')
-            ->setParameter(':session', $session);
+            ->setParameter(':session', $session)
+            ->setCacheable(false);
         $query = $qb->getQuery();
         return $query->execute();
     }

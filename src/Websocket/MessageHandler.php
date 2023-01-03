@@ -34,14 +34,14 @@ readonly class MessageHandler implements MessageComponentInterface
 
             switch ($message->command) {
                 case 'get_history':
-                    $this->output->writeln('Found messages: ' . count($session->getChats()));
-                    if (count($session->getChats())) {
-                        $chats = $this->chatManager->getChats($session);
+                    $chats = $this->chatManager->getChats($session);
+                    $this->output->writeln('Found messages: ' . count($chats));
+                    if (count($chats)) {
                         foreach ($chats as $chat) {
                             $message = new Message(
-                                name: $chat->getName() . '1',
+                                name: $chat->getName(),
                                 message: $chat->getMessage(),
-                                session: $chat->getSession(),
+                                session: (string)$chat->getSession(),
                                 isOperator: $chat->isIsOperator(),
                             );
                             $msg = json_encode($message);
@@ -59,6 +59,12 @@ readonly class MessageHandler implements MessageComponentInterface
                         $from->send($msg);
                     }
                     break;
+                case 'add_message':
+                    $message = json_decode($msg);
+                    $message->isOperator = false;
+                    $message->session = $session;
+                    $this->chatManager->addMessage($session, $message);
+                    $from->send($msg);
             }
         } catch (\Exception $exception) {
             $this->output->writeln($exception->getMessage());

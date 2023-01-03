@@ -35,7 +35,12 @@ class ChatManager
         return $session;
     }
 
-    public function addMessage(Session $session, Message $message): void
+    /**
+     * @param Session $session
+     * @param Message|\stdClass $message
+     * @return void
+     */
+    public function addMessage(Session $session, Message|\stdClass $message): void
     {
         $chat = new Chat();
         $chat
