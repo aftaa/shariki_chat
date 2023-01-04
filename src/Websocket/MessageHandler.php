@@ -11,7 +11,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MessageHandler implements MessageComponentInterface
 {
-    private ?ConnectionInterface $operator = null;
     /**
      * @var ConnectionInterface[]
      */
@@ -22,14 +21,13 @@ class MessageHandler implements MessageComponentInterface
         private readonly ChatManager       $chatManager,
         private readonly OperatorManager   $operatorManager,
         private readonly OutputInterface   $output,
-        private readonly \SplObjectStorage $connections = new \SplObjectStorage(),
+        private readonly ConnectionManager $operatorConnections = new ConnectionManager(),
     )
     {
     }
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->connections->attach($conn);
         $this->output->writeln('New connection');
     }
 
@@ -41,18 +39,18 @@ class MessageHandler implements MessageComponentInterface
 
             switch ($message->command) {
                 case 'add_op_message':
-                    $this->operator = $from;
+                    $this->operatorConnections->add($from);
                     $message = json_decode($msg);
                     $session = $this->chatManager->getSession($message->session);
                     $message->session = $session;
                     $this->chatManager->addMessage($session, $message);
-                    $from->send($msg);
+                    $this->operatorConnections->send($msg);
                     if (array_key_exists($session->getName(), $this->sessions)) {
                         $this->sessions[$session->getName()]->send($msg);
                     }
                     break;
                 case 'get_sessions':
-                    $this->operator = $from;
+                    $this->operatorConnections->add($from);
 
                     $sessions = $this->operatorManager->getSessions();
                     $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
@@ -66,14 +64,12 @@ class MessageHandler implements MessageComponentInterface
                             ],
                         ];
                         $msg = json_encode($msg, JSON_FORCE_OBJECT);
-                        $from->send($msg);
+                        $this->operatorConnections->send($msg);
                     }
                     break;
                 case 'get_history':
                     $session = $this->chatManager->getSession($message->session);
                     $this->sessions[$session->getName()] = $from;
-                case 'get_op_history':
-                    $session = $this->chatManager->getSession($message->session);
                     $chats = $this->chatManager->getChats($session);
                     $this->output->writeln('Found messages: ' . count($chats));
                     if (count($chats)) {
@@ -99,6 +95,33 @@ class MessageHandler implements MessageComponentInterface
                         $from->send($msg);
                     }
                     break;
+                case 'get_op_history':
+                    $session = $this->chatManager->getSession($message->session);
+                    $chats = $this->chatManager->getChats($session);
+                    $this->output->writeln('Found messages: ' . count($chats));
+                    if (count($chats)) {
+                        foreach ($chats as $chat) {
+                            $message = new Message(
+                                name: $chat->getName(),
+                                message: $chat->getMessage(),
+                                session: (string)$chat->getSession(),
+                                isOperator: $chat->isIsOperator(),
+                            );
+                            $msg = json_encode($message);
+                            $from->send($msg);
+                        }
+                    } else {
+                        $answer = new Message(
+                            name: 'Чат-бот',
+                            message: 'Здравствуйте!',
+                            session: $message->session,
+                            isOperator: true,
+                        );
+                        $this->chatManager->addMessage($session, $answer);
+                        $msg = json_encode($answer);
+                        $this->operatorConnections->send($msg);
+                    }
+                    break;
                 case 'add_message':
                     $session = $this->chatManager->getSession($message->session);
                     $this->sessions[$session->getName()] = $from;
@@ -121,13 +144,13 @@ class MessageHandler implements MessageComponentInterface
 
     public function onClose(ConnectionInterface $conn)
     {
+        $this->operatorConnections->del($conn);
         $this->output->writeln('Close connection');
-        $this->connections->detach($conn);
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        $this->connections->detach($conn);
+        $this->operatorConnections->del($conn);
         $conn->close();
     }
 }
