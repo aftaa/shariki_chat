@@ -195,7 +195,7 @@
                 event.preventDefault();
                 let target = this.dataset.chat;
                 let session = this.dataset.session;
-                queryMessages()
+                queryMessages(session)
                 $('.messages').hide();
                 $(target).show();
                 scrollToBottom(session);

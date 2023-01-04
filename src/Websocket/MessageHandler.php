@@ -22,6 +22,7 @@ class MessageHandler implements MessageComponentInterface
         private readonly OperatorManager   $operatorManager,
         private readonly OutputInterface   $output,
         private readonly ConnectionManager $operatorConnections = new ConnectionManager(),
+        private readonly SessionManager    $sessionsConnections = new SessionManager(),
     )
     {
     }
@@ -42,13 +43,13 @@ class MessageHandler implements MessageComponentInterface
                     $this->operatorAddMessage($connection, $msg);
                     break;
                 case 'get_sessions':
-                    $this->operatorGetSessions($connection, $msg);
+                    $this->operatorGetSessions($connection);
                     break;
                 case 'get_history':
-                    $this->getHistory($message, $connection, $msg);
+                    $this->getHistory($message, $connection);
                     break;
                 case 'get_op_history':
-                    $this->operatorGetHistory($message, $connection, $msg);
+                    $this->operatorGetHistory($message, $connection);
                     break;
                 case 'add_message':
                     $this->addMessage($message, $connection, $msg);
@@ -58,22 +59,11 @@ class MessageHandler implements MessageComponentInterface
         }
     }
 
-    public function onClose(ConnectionInterface $conn)
-    {
-        $this->operatorConnections->del($conn);
-        $this->output->writeln('Close connection');
-    }
-
-    public function onError(ConnectionInterface $conn, \Exception $e)
-    {
-        $this->operatorConnections->del($conn);
-        $conn->close();
-    }
-
     /**
      * @param ConnectionInterface $connection
      * @param string $msg
      * @return void
+     * @throws \Exception
      */
     public function operatorAddMessage(ConnectionInterface $connection, string $msg): void
     {
@@ -82,19 +72,17 @@ class MessageHandler implements MessageComponentInterface
         $session = $this->chatManager->getSession($message->session);
         $message->session = $session;
         $this->chatManager->addMessage($session, $message);
+
         $this->operatorConnections->send($msg);
-        if (array_key_exists($session->getName(), $this->sessions)) {
-            $this->sessions[$session->getName()]->send($msg);
-        }
+        $this->sessionsConnections->send($session->getName(), $msg);
     }
 
     /**
      * @param ConnectionInterface $connection
-     * @param object $msg
      * @return void
      * @throws \Doctrine\DBAL\Exception
      */
-    public function operatorGetSessions(ConnectionInterface $connection, object $msg): void
+    public function operatorGetSessions(ConnectionInterface $connection): void
     {
         $this->operatorConnections->add($connection);
 
@@ -110,42 +98,6 @@ class MessageHandler implements MessageComponentInterface
                 ],
             ];
             $msg = json_encode($msg, JSON_FORCE_OBJECT);
-            $this->operatorConnections->send($msg);
-        }
-    }
-
-    /**
-     * @param mixed $message
-     * @param ConnectionInterface $connection
-     * @param false|string $msg
-     * @return void
-     */
-    public function getHistory(mixed $message, ConnectionInterface $connection, false|string $msg): void
-    {
-        $session = $this->chatManager->getSession($message->session);
-        $this->sessions[$session->getName()] = $connection;
-        $chats = $this->chatManager->getChats($session);
-        $this->output->writeln('Found messages: ' . count($chats));
-        if (count($chats)) {
-            foreach ($chats as $chat) {
-                $message = new Message(
-                    name: $chat->getName(),
-                    message: $chat->getMessage(),
-                    session: (string)$chat->getSession(),
-                    isOperator: $chat->isIsOperator(),
-                );
-                $msg = json_encode($message);
-                $connection->send($msg);
-            }
-        } else {
-            $answer = new Message(
-                name: 'Чат-бот',
-                message: 'Здравствуйте!',
-                session: $message->session,
-                isOperator: true,
-            );
-            $this->chatManager->addMessage($session, $answer);
-            $msg = json_encode($answer);
             $connection->send($msg);
         }
     }
@@ -153,10 +105,45 @@ class MessageHandler implements MessageComponentInterface
     /**
      * @param mixed $message
      * @param ConnectionInterface $connection
-     * @param false|string $msg
+     * @return void
+     * @throws \Exception
+     */
+    public function getHistory(mixed $message, ConnectionInterface $connection): void
+    {
+        $this->sessionsConnections->add($message->session, $connection);
+        $session = $this->chatManager->getSession($message->session);
+        $chats = $this->chatManager->getChats($session);
+        $this->output->writeln('Found messages: ' . count($chats));
+        if (count($chats)) {
+            foreach ($chats as $chat) {
+                $message = new Message(
+                    name: $chat->getName(),
+                    message: $chat->getMessage(),
+                    session: (string)$chat->getSession(),
+                    isOperator: $chat->isIsOperator(),
+                );
+                $msg = json_encode($message);
+                $this->sessionsConnections->send($message->session, $msg);
+            }
+        } else {
+            $answer = new Message(
+                name: 'Чат-бот',
+                message: 'Здравствуйте!',
+                session: $message->session,
+                isOperator: true,
+            );
+            $this->chatManager->addMessage($session, $answer);
+            $msg = json_encode($answer);
+            $this->sessionsConnections->send($message->session, $msg);
+        }
+    }
+
+    /**
+     * @param mixed $message
+     * @param ConnectionInterface $connection
      * @return void
      */
-    public function operatorGetHistory(mixed $message, ConnectionInterface $connection, false|string $msg): void
+    public function operatorGetHistory(mixed $message, ConnectionInterface $connection): void
     {
         $session = $this->chatManager->getSession($message->session);
         $chats = $this->chatManager->getChats($session);
@@ -172,16 +159,6 @@ class MessageHandler implements MessageComponentInterface
                 $msg = json_encode($message);
                 $connection->send($msg);
             }
-        } else {
-            $answer = new Message(
-                name: 'Чат-бот',
-                message: 'Здравствуйте!',
-                session: $message->session,
-                isOperator: true,
-            );
-            $this->chatManager->addMessage($session, $answer);
-            $msg = json_encode($answer);
-            $this->operatorConnections->send($msg);
         }
     }
 
@@ -190,17 +167,40 @@ class MessageHandler implements MessageComponentInterface
      * @param ConnectionInterface $connection
      * @param string $msg
      * @return void
+     * @throws \Exception
      */
     public function addMessage(mixed $message, ConnectionInterface $connection, string $msg): void
     {
         $session = $this->chatManager->getSession($message->session);
-        $this->sessions[$session->getName()] = $connection;
-
+        $this->sessionsConnections->add($message->session, $connection);
         $message = json_decode($msg);
         $message->isOperator = false;
         $message->session = $session;
         $this->chatManager->addMessage($session, $message);
-        $connection->send($msg);
+        $this->sessionsConnections->send($session->getName(), $msg);
         $this->operatorConnections->send($msg);
+    }
+
+    /**
+     * @param ConnectionInterface $conn
+     * @return void
+     */
+    public function onClose(ConnectionInterface $conn): void
+    {
+        $this->operatorConnections->del($conn);
+        $this->sessionsConnections->del($conn);
+        $this->output->writeln('Close connection');
+    }
+
+    /**
+     * @param ConnectionInterface $conn
+     * @param \Exception $e
+     * @return void
+     */
+    public function onError(ConnectionInterface $conn, \Exception $e): void
+    {
+        $this->operatorConnections->del($conn);
+        $this->sessionsConnections->del($conn);
+        $conn->close();
     }
 }
