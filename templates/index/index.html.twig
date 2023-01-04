@@ -101,36 +101,108 @@
             color: #fff;
             display: block;
             border-radius: 25px;
-         }
+        }
+        #welcome-message, #timeout-message {
+            margin: 5px 0;
+        }
+        #welcome-message input, #timeout-message input {
+            width: 300px;
+        }
+
     </style>
 
     <header>
         <div id="status">DISCONNECTED</div>
+        <div id="work-mode">
+            <label for="work-mode-select">
+                Режим работы:
+            </label>
+            <select id="work-mode-select">
+                <option value="bot">Bot</option>
+                <option value="operator">Operator</option>
+            </select>
+        </div>
+        <div id="welcome-message">
+            <label>
+                Бот-приветствие в чате:
+                <input type="text">
+            </label>
+        </div>
+        <div id="timeout-message">
+            <label>
+                Бот-сообщение в нерабочее время:
+                <input type="text">
+            </label>
+        </div>
     </header>
 
     <aside></aside>
 
     <main></main>
 
+    <script>
+        var socket;
+    </script>
+
     {% if local %}
-        <script>const socket = new WebSocket("ws://localhost:3001");</script>
+        <script>let socket_addr = 'ws://localhost:3001';</script>
     {% else %}
-        <script>const socket = new WebSocket("wss://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai:3002");</script>
+        <script>let socket_addr = 'wss://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai:3002';</script>
     {% endif %}
 
     <script>
+        function connect() {
+            socket = new WebSocket(socket_addr);
+            socket.addEventListener("open", function () {
+                $('#status').html("CONNECTED");
+                let command = {
+                    command: 'get_sessions'
+                };
+                socket.send(JSON.stringify(command));
+
+                command = {
+                    command: 'get_work_mode'
+                };
+                socket.send(JSON.stringify(command));
+            });
+
+            socket.addEventListener("message", function (e) {
+                const message = JSON.parse(e.data);
+                switch (message.command) {
+                    case 'session':
+                        addSession(message.session);
+                        queryMessages(message.session.name);
+                        break;
+                    case 'work_mode':
+                        let work_mode = message.work_mode;
+                        let select = document.getElementById('work-mode-select');
+                        switch (work_mode) {
+                            case 'bot':
+                                select.selectedIndex = 0;
+                                break;
+                            default:
+                                select.selectedIndex = 1;
+                        }
+                        break;
+                    case 'new_message':
+                        addMessage(message);
+                        break;
+                }
+            });
+
+            socket.addEventListener("close", function () {
+                $('#status').html("DISCONNECTED");
+                $('aside,main').html('');
+            });
+        }
+
+        connect();
+
         function scrollToBottom(session) {
             let chatMessages = document.getElementById("chat-" + session);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        socket.addEventListener("open", function () {
-            $('#status').html("CONNECTED");
-            const command = {
-                command: 'get_sessions'
-            };
-            socket.send(JSON.stringify(command));
-        });
 
         function queryMessages(session) {
             const command = {
@@ -140,17 +212,6 @@
             socket.send(JSON.stringify(command));
         }
 
-        socket.addEventListener("message", function (e) {
-            const message = JSON.parse(e.data);
-            switch (message.type) {
-                case 'session':
-                    addSession(message.session);
-                    queryMessages(message.session.name);
-                    break;
-                default:
-                    addMessage(message);
-            }
-        });
 
         function addMessage(message) {
             let $box = createMessageBox(message.session);
@@ -176,7 +237,6 @@
                 $('#messages-' + session).append(form);
                 formEventListener(session);
             }
-
             return $('#chat-' + session);
         }
 
@@ -231,9 +291,22 @@
             scrollToBottom(session);
         }
 
-        socket.addEventListener("close", function () {
-            $('#status').html("DISCONNECTED");
-        });
+        setInterval(function () {
+            let status = $('#status').html();
+            if ('DISCONNECTED' === status) {
+                console.log('Trying to connect to server', socket_addr);
+                connect();
+            }
+        }, 10000);
 
+        $('#work-mode-select').on('change', function (event) {
+            let work_mode = $('option:selected', this).val();
+            let message = {
+                command: 'set_work_mode',
+                work_mode: work_mode
+            };
+            message = JSON.stringify(message);
+            socket.send(message);
+        })
     </script>
 {% endblock %}

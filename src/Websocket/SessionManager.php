@@ -48,4 +48,15 @@ class SessionManager
         }
         $this->sessions[$session]->send($message);
     }
+
+    /**
+     * @param string $message
+     * @return void
+     */
+    public function sendAll(string $message): void
+    {
+        foreach ($this->sessions as $session => $connectionManager) {
+            $connectionManager->send($message);
+        }
+    }
 }
