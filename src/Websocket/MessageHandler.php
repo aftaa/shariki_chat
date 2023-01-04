@@ -59,10 +59,10 @@ class MessageHandler implements MessageComponentInterface
                     foreach ($sessions as $session) {
                         $msg = (object)[
                             'type' => 'session',
-                            'session' => [
-                                'name' => $session->getName(),
-                                'id' => $session->getId(),
-                                'started' => $session->getSessionStarted()->format('d.m.y H:i'),
+                            'session' => (object)[
+                                'name' => $session['session'],
+                                'id' => $session['id'],
+                                'started' => $session['last_message'],
                             ],
                         ];
                         $msg = json_encode($msg, JSON_FORCE_OBJECT);

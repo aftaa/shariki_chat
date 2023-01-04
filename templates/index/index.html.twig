@@ -89,6 +89,19 @@
             border-radius: 17px;
             cursor: pointer;
         }
+
+        .session a {
+            background: #22ceb6;
+            width: 250px;
+            height: 50px;
+            line-height: 50px;
+            font-size: 50px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            display: block;
+            border-radius: 25px;
+         }
     </style>
 
     <header>
@@ -168,12 +181,11 @@
         }
 
         function addSession(session) {
-            let html = '<div class="session" id="session-' + session.name
-                + '"><b>' + session.id + '</b><br><span class="started">'
-                + session.started + '</span><br><a href=""'
+            let html = '<div class="session" id="session-' + session.name + '">'
+                + '</span><br><a href=""'
                 + ' data-chat="#messages-' + session.name + '" data-session="'
-                + session.name + '">перейти к диалогу</a>'
-                + '<br><i><small>' + session.name + '</small></i></div>';
+                + session.name + '">Чат ' + session.id + '</a>'
+                + '<br><i><small></small></i></div>';
             $('aside').append(html);
             anchorEventListener(session);
         }

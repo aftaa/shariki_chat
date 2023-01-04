@@ -61,17 +61,21 @@ class SessionRepository extends ServiceEntityRepository
      */
     public function getSessions(): array
     {
-//        $this->getEntityManager()->getConnection()->executeQuery(
-//            'SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))',
-//        );
+        $this->getEntityManager()->getConnection()->executeQuery(
+            'SET sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))',
+        );
 
-        return $this
-            ->createQueryBuilder('s')
-//            ->select('s.id AS id, s.name AS session, c.created AS last_message')
-//            ->join(Chat::class, 'c', Join::ON)
-//            ->orderBy('c.created', 'DESC')
-//            ->groupBy('s.id')
-            ->getQuery()
-            ->execute();
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = '
+            SELECT s.id AS id, s.name AS session, 
+            (SELECT created FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) AS last_message
+            FROM session s 
+            ORDER BY last_message DESC
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAllAssociative();
     }
 }
