@@ -126,12 +126,14 @@
             <label>
                 Бот-приветствие в чате:
                 <input type="text">
+                <button>Сохранить</button>
             </label>
         </div>
         <div id="timeout-message">
             <label>
                 Бот-сообщение в нерабочее время:
                 <input type="text">
+                <button>Сохранить</button>
             </label>
         </div>
     </header>
@@ -164,6 +166,16 @@
                     command: 'get_work_mode'
                 };
                 socket.send(JSON.stringify(command));
+
+                command = {
+                    command: 'load_welcome_message'
+                };
+                socket.send(JSON.stringify(command));
+
+                command = {
+                    command: 'load_timeout_message'
+                };
+                socket.send(JSON.stringify(command));
             });
 
             socket.addEventListener("message", function (e) {
@@ -186,6 +198,12 @@
                         break;
                     case 'new_message':
                         addMessage(message);
+                        break;
+                    case 'welcome_message':
+                        $('#welcome-message input').val(message.message);
+                        break;
+                    case 'timeout_message':
+                        $('#timeout-message input').val(message.message);
                         break;
                 }
             });
@@ -255,7 +273,8 @@
                 event.preventDefault();
                 let target = this.dataset.chat;
                 let session = this.dataset.session;
-                queryMessages(session)
+                $('#chat-' + session).html('');
+                queryMessages(session);
                 $('.messages').hide();
                 $(target).show();
                 scrollToBottom(session);
@@ -304,6 +323,26 @@
             let message = {
                 command: 'set_work_mode',
                 work_mode: work_mode
+            };
+            message = JSON.stringify(message);
+            socket.send(message);
+        })
+
+        $('#welcome-message button').on('click', function () {
+            let message = $('#welcome-message input').val();
+            message = {
+                command: 'save_welcome_message',
+                message: message
+            };
+            message = JSON.stringify(message);
+            socket.send(message);
+        })
+
+        $('#timeout-message button').on('click', function () {
+            let message = $('#timeout-message input').val();
+            message = {
+                command: 'save_timeout_message',
+                message: message
             };
             message = JSON.stringify(message);
             socket.send(message);

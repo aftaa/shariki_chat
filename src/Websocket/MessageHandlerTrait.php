@@ -68,10 +68,10 @@ trait MessageHandlerTrait
         if (count($chats)) {
             foreach ($chats as $chat) {
                 $message = new Message(
-                    command: 'new_message',
                     name: $chat->getName(),
                     message: $chat->getMessage(),
                     session: (string)$chat->getSession(),
+                    command: 'new_message',
                     isOperator: $chat->isIsOperator(),
                 );
                 $msg = json_encode($message);
@@ -80,7 +80,7 @@ trait MessageHandlerTrait
         } else {
             $answer = new Message(
                 name: 'Чат-бот',
-                message: 'Здравствуйте!',
+                message: $this->chatManager->botWelcomeMessage(),
                 session: $message->session,
                 isOperator: true,
             );
@@ -135,6 +135,20 @@ trait MessageHandlerTrait
         $msg = json_encode($message);
         $this->sessionsConnections->send($session->getName(), $msg);
         $this->operatorConnections->send($msg);
+
+        if ('bot' === $this->operatorManager->getWorkMode()) {
+            $message = new Message(
+                name: 'Чат-бот',
+                message: $this->chatManager->botTimeoutMessage(),
+                session: $session->getName(),
+                command: 'new_message',
+                isOperator: true,
+            );
+            $this->chatManager->addMessage($session, $message);
+            $msg = json_encode($message);
+            $this->operatorConnections->send($msg);
+            $this->sessionsConnections->send($session->getName(), $msg);
+        }
     }
 
     /**
@@ -170,5 +184,53 @@ trait MessageHandlerTrait
         $msg = json_encode($message);
         $this->operatorConnections->send($msg);
         $this->sessionsConnections->sendAll($msg);
+    }
+
+    /**
+     * @return void
+     */
+    private function loadWelcomeMessage(): void
+    {
+        $welcomeMessage = $this->chatManager->botWelcomeMessage();
+        $message = (object)[
+            'command' => 'welcome_message',
+            'message' => $welcomeMessage,
+        ];
+        $msg = json_encode($message);
+        $this->operatorConnections->send($msg);
+    }
+
+    /**
+     * @return void
+     */
+    private function loadTimeoutMessage(): void
+    {
+        $timeoutMessage = $this->chatManager->botTimeoutMessage();
+        $message = (object)[
+            'command' => 'timeout_message',
+            'message' => $timeoutMessage,
+        ];
+        $msg = json_encode($message);
+        $this->operatorConnections->send($msg);
+    }
+
+    /**
+     * @param object $welcomeMessage
+     * @return void
+     */
+    private function saveWelcomeMessage(object $welcomeMessage): void
+    {
+        $this->chatManager->updateWelcomeMessage($welcomeMessage->message);
+        $this->loadWelcomeMessage();
+    }
+
+    /**
+     * @param object $timeoutMessage
+     * @return void
+     */
+    private function saveTimeoutMessage(object $timeoutMessage): void
+    {
+        $this->chatManager->updateTimeoutMessage($timeoutMessage->message);
+        $this->loadTimeoutMessage();
     }
 }

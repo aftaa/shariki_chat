@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class MessageHandler implements MessageComponentInterface
 {
     use MessageHandlerTrait;
+
     /**
      * @var ConnectionInterface[]
      */
@@ -61,6 +62,19 @@ class MessageHandler implements MessageComponentInterface
                     break;
                 case 'add_message':
                     $this->addMessage($message, $connection, $msg);
+                    break;
+                case 'load_welcome_message':
+                    $this->loadWelcomeMessage(); // returns command 'welcome_message'
+                    break;
+                case 'load_timeout_message':
+                    $this->loadTimeoutMessage(); // returns command 'timeout_message'
+                    break;
+                case 'save_welcome_message':
+                    $this->saveWelcomeMessage($message); // returns command 'welcome_message'
+                    break;
+                case 'save_timeout_message':
+                    $this->saveTimeoutMessage($message); // returns command 'timeout_message'
+                    break;
             }
         } catch (\Exception $exception) {
             $this->output->writeln(

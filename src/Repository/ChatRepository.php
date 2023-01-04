@@ -40,30 +40,6 @@ class ChatRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Chat[] Returns an array of Chat objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Chat
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
     /**
      * @param Session $session
      * @return Chat[]
@@ -73,8 +49,7 @@ class ChatRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('c');
         $qb->where('c.session = :session')
             ->orderBy('c.created', 'ASC')
-            ->setParameter(':session', $session)
-            ->setCacheable(false);
+            ->setParameter(':session', $session);
         $query = $qb->getQuery();
         return $query->execute();
     }

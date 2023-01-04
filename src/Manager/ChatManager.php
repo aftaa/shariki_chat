@@ -6,6 +6,7 @@ use App\Chat\Message;
 use App\Entity\Chat;
 use App\Entity\Session;
 use App\Repository\ChatRepository;
+use App\Repository\MessageRepository;
 use App\Repository\SessionRepository;
 
 class ChatManager
@@ -13,6 +14,7 @@ class ChatManager
     public function __construct(
         public ChatRepository    $chatRepository,
         public SessionRepository $sessionRepository,
+        public MessageRepository $messageRepository,
     )
     {
     }
@@ -58,7 +60,44 @@ class ChatManager
      */
     public function getChats(Session $session): array
     {
-        $chats = $this->chatRepository->getChats($session);
-        return $chats;
+        return $this->chatRepository->getChats($session);
+    }
+
+    /**
+     * @return string
+     */
+    public function botWelcomeMessage(): string
+    {
+        return $this->messageRepository->find(1)->getText();
+    }
+
+    /**
+     * @return string
+     */
+    public function botTimeoutMessage(): string
+    {
+        return $this->messageRepository->find(2)->getText();
+    }
+
+    /**
+     * @param string $welcomeMessage
+     * @return void
+     */
+    public function updateWelcomeMessage(string $welcomeMessage): void
+    {
+        $message = $this->messageRepository->find(1);
+        $message->setText($welcomeMessage);
+        $this->messageRepository->save($message, true);
+    }
+
+    /**
+     * @param string $timeoutMessage
+     * @return void
+     */
+    public function updateTimeoutMessage(string $timeoutMessage): void
+    {
+        $message = $this->messageRepository->find(2);
+        $message->setText($timeoutMessage);
+        $this->messageRepository->save($message, true);
     }
 }
