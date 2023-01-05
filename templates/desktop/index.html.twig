@@ -91,14 +91,14 @@
         }
 
         .session a {
-            background: #22ceb6;
+            --background: #22ceb6;
             width: 250px;
-            height: 50px;
-            line-height: 50px;
-            font-size: 50px;
-            text-align: center;
+            --height: 50px;
+            --line-height: 50px;
+            --font-size: 50px;
+            --text-align: center;
             text-decoration: none;
-            color: #fff;
+            --color: #fff;
             display: block;
             border-radius: 25px;
         }
@@ -263,7 +263,10 @@
                 + '</span><br><a href=""'
                 + ' data-chat="#messages-' + session.name + '" data-session="'
                 + session.name + '">Чат ' + session.id + '</a>'
-                + '<br><i><small></small></i></div>';
+                + 'Начат: ' + session.started + '<br>'
+                + 'Посл. сообщ.: ' + session.last_message + '<br>'
+                + 'Всего сообщ.: ' + session.message_count + '<br>'
+                + '</div>';
             $('aside').append(html);
             anchorEventListener(session);
         }

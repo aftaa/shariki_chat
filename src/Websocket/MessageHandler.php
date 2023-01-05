@@ -3,6 +3,7 @@
 namespace App\Websocket;
 
 use App\Chat\Message;
+use App\Manager\ChatDateManager;
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
 use Ratchet\ConnectionInterface;
@@ -25,6 +26,7 @@ class MessageHandler implements MessageComponentInterface
         private readonly OutputInterface   $output,
         private readonly ConnectionManager $operatorConnections = new ConnectionManager(),
         private readonly SessionManager    $sessionsConnections = new SessionManager(),
+        private readonly ChatDateManager   $chatDateManager = new ChatDateManager(),
     )
     {
     }

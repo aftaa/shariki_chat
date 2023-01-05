@@ -68,8 +68,9 @@ class SessionRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
-            SELECT s.id AS id, s.name AS session, 
-            (SELECT created FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) AS last_message
+            SELECT s.id AS id, s.name AS `session`, s.session_started AS started, 
+            (SELECT created FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) AS last_message,
+            (SELECT COUNT(*) FROM chat WHERE s.id=session_id) AS message_count
             FROM session s 
             ORDER BY last_message DESC
         ';

@@ -39,6 +39,7 @@ trait MessageHandlerTrait
      * @param ConnectionInterface $connection
      * @return void
      * @throws \Doctrine\DBAL\Exception
+     * @throws \Exception
      */
     public function operatorGetSessions(ConnectionInterface $connection): void
     {
@@ -52,7 +53,9 @@ trait MessageHandlerTrait
                 'session' => (object)[
                     'name' => $session['session'],
                     'id' => $session['id'],
-                    'last_message' => $session['last_message'],
+                    'last_message' => $this->chatDateManager->format($session['last_message']),
+                    'started' => $this->chatDateManager->format($session['started']),
+                    'message_count' => $session['message_count'],
                 ],
             ];
             $msg = json_encode($msg, JSON_FORCE_OBJECT);
@@ -113,11 +116,12 @@ trait MessageHandlerTrait
         if (count($chats)) {
             foreach ($chats as $chat) {
                 $message = new Message(
-                    command: 'new_message',
                     name: $chat->getName(),
                     message: $chat->getMessage(),
                     session: (string)$chat->getSession(),
+                    command: 'new_message',
                     isOperator: $chat->isIsOperator(),
+                    created: $this->chatDateManager->format($chat->getCreated()),
                 );
                 $msg = json_encode($message);
                 $connection->send($msg);

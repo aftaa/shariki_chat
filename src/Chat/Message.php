@@ -10,6 +10,7 @@ class Message
         public ?string $session = null,
         public ?string $command = null,
         public ?bool $isOperator = null,
+        public ?string $created = null,
     )
     {
     }
