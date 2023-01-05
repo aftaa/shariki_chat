@@ -26,6 +26,13 @@ trait MessageHandlerTrait
         $msg = json_encode($message);
         $this->operatorConnections->send($msg);
         $this->sessionsConnections->send($session->getName(), $msg);
+
+        $message = (object)[
+            'command' => 'open_chat',
+            'session' => $session->getName(),
+        ];
+        $msg = json_encode($message);
+        $this->sessionsConnections->send($session->getName(), $msg);
     }
 
     /**
