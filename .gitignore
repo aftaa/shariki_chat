@@ -1,3 +1,4 @@
+/etc/logs
 
 ###> symfony/framework-bundle ###
 /.env.local
