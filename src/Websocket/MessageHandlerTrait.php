@@ -88,12 +88,15 @@ trait MessageHandlerTrait
             $answer = new Message(
                 name: 'Чат-бот',
                 message: $this->chatManager->botWelcomeMessage(),
-                session: $message->session,
+                session: $session->getName(),
+                command: 'new_message',
                 isOperator: true,
             );
             $this->chatManager->addMessage($session, $answer);
             $msg = json_encode($answer);
-            $this->sessionsConnections->send($message->session, $msg);
+            $this->output->writeln('Sending welcome message');
+            $this->sessionsConnections->send($session->getName(), $msg);
+            $this->operatorConnections->send($msg);
         }
     }
 
