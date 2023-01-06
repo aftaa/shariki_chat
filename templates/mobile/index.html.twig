@@ -264,7 +264,7 @@
                 $messages.append($message);
                 scrollToBottom(message.session);
             } else {
-                $('#session-' + message.session).addClass('new-message');
+                $('#session-' + message.session).addClass('new-message').prependTo('main');
             }
         }
 
