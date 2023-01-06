@@ -19,9 +19,9 @@ trait MessageHandlerTrait
         $message = json_decode($msg);
         $session = $this->chatManager->getSession($message->session);
         $message->session = $session;
-        $this->chatManager->addMessage($session, $message);
-
+        $chat = $this->chatManager->addMessage($session, $message);
         $message = json_decode($msg);
+        $message->created = $this->chatDateManager->format($chat->getCreated());
         $message->command = 'new_message';
         $msg = json_encode($message);
         $this->operatorConnections->send($msg);
@@ -56,6 +56,7 @@ trait MessageHandlerTrait
                     'last_message' => $this->chatDateManager->format($session['last_message']),
                     'started' => $this->chatDateManager->format($session['started']),
                     'message_count' => $session['message_count'],
+                    'has_new_message' => $session['has_new_message'],
                 ],
             ];
             $msg = json_encode($msg, JSON_FORCE_OBJECT);
@@ -107,6 +108,7 @@ trait MessageHandlerTrait
      * @param mixed $message
      * @param ConnectionInterface $connection
      * @return void
+     * @throws \Exception
      */
     public function operatorGetHistory(mixed $message, ConnectionInterface $connection): void
     {
@@ -143,7 +145,8 @@ trait MessageHandlerTrait
         $message = json_decode($msg);
         $message->isOperator = false;
         $message->session = $session;
-        $this->chatManager->addMessage($session, $message);
+        $chat = $this->chatManager->addMessage($session, $message);
+        $message->created = $this->chatDateManager->format($chat->getCreated());
         $message = json_decode($msg);
         $message->command = 'new_message';
         $msg = json_encode($message);
@@ -158,7 +161,8 @@ trait MessageHandlerTrait
                 command: 'new_message',
                 isOperator: true,
             );
-            $this->chatManager->addMessage($session, $message);
+            $chat = $this->chatManager->addMessage($session, $message);
+            $message->created = $this->chatDateManager->format($chat->getCreated());
             $msg = json_encode($message);
             $this->operatorConnections->send($msg);
             $this->sessionsConnections->send($session->getName(), $msg);

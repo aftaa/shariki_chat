@@ -40,9 +40,9 @@ class ChatManager
     /**
      * @param Session $session
      * @param Message|\stdClass $message
-     * @return void
+     * @return Chat
      */
-    public function addMessage(Session $session, Message|\stdClass $message): void
+    public function addMessage(Session $session, Message|\stdClass $message): Chat
     {
         $chat = new Chat();
         $chat
@@ -52,6 +52,7 @@ class ChatManager
             ->setCreated(new \DateTime())
             ->setIsOperator($message->isOperator);
         $this->chatRepository->save($chat, true);
+        return $chat;
     }
 
     /**

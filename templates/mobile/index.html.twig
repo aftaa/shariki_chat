@@ -42,6 +42,10 @@
             cursor: pointer;
         }
 
+        .new-message {
+            background: lightgreen;
+        }
+
         .messages {
             border: 1px solid gray;
             border-radius: 10px;
@@ -223,6 +227,11 @@
             $('.started', $div).html(session.started);
             $('.chat', $div).attr('id', 'chat-' + session.name).hide();
             $('.messages', $div).attr('id', 'messages-' + session.name).html('');
+            $('input, button', $div).attr('data-session', session.name);
+            $('input', $div).attr('id', 'text-' + session.name);
+            if (session.has_new_message) {
+                $div.addClass('new-message');
+            }
             $('main').append($div);
         }
 
@@ -236,20 +245,55 @@
             });
             $('.chat').hide();
             $('#chat-' + this.dataset.session).show();
+            $('#session-' + this.dataset.session).removeClass('new-message');
         })
 
         function drawMessage(message) {
-            let $messages = $('#messages-' + message.session);
-            let $message = $('footer ' + (message.isOperator ? '.operator' : '.visitor')).clone();
-            $('.text', $message).html(message.message);
-            $('.datetime', $message).html(message.created);
-            $messages.append($message);
-            scrollToBottom(message.session)
+            if ('none' !== $('#chat-' + message.session).css('display')) {
+                let $messages = $('#messages-' + message.session);
+                let $message = $('footer ' + (message.isOperator ? '.operator' : '.visitor')).clone();
+                $('.text', $message).html(message.message);
+                $('.datetime', $message).html(message.created);
+                $messages.append($message);
+                scrollToBottom(message.session);
+            } else {
+                $('#session-' + message.session).addClass('new-message');
+            }
         }
 
         function scrollToBottom(session) {
             let chatMessages = document.getElementById("messages-" + session);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        $('button').on('click', function () {
+            let session = this.dataset.session;
+            let text = $('#text-' + session).val();
+            if ($.trim(text)) {
+                sendMessage(session, text);
+                $('#text-' + session).val('')
+            }
+        })
+
+        $('input').on('keypress', function (event) {
+            if (13 === event.keyCode) {
+                let session = this.dataset.session;
+                let text = this.value;
+                if ($.trim(text)) {
+                    sendMessage(session, text);
+                    this.value = '';
+                }
+            }
+        })
+
+        function sendMessage(session, text) {
+            command({
+                command: 'add_op_message',
+                session: session,
+                message: text,
+                name: 'Оператор',
+                isOperator: true
+            });
         }
 
         let width = $('.messages').width();
