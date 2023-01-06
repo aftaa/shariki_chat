@@ -71,7 +71,10 @@ class SessionRepository extends ServiceEntityRepository
             SELECT s.id AS id, s.name AS `session`, s.session_started AS started, 
             (SELECT created FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) AS last_message,
             (SELECT COUNT(*) FROM chat WHERE s.id=session_id) AS message_count,
-            (SELECT NOT is_operator FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) AS has_new_message 
+            (SELECT NOT is_operator FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
+                OR 
+            (SELECT "Чат-бот" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
+                AS has_new_message 
             FROM session s 
             ORDER BY last_message DESC
         ';

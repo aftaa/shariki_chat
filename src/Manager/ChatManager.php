@@ -8,6 +8,7 @@ use App\Entity\Session;
 use App\Repository\ChatRepository;
 use App\Repository\MessageRepository;
 use App\Repository\SessionRepository;
+use Doctrine\ORM\NonUniqueResultException;
 
 class ChatManager
 {
@@ -21,12 +22,15 @@ class ChatManager
 
     /**
      * @param string $sessionKey
-     * @return Session
+     * @return array{Session, bool}
+     * @throws NonUniqueResultException
      */
-    public function getSession(string $sessionKey): Session
+    public function getSession(string $sessionKey): array
     {
         $session = $this->sessionRepository->getSession($sessionKey);
+        $isNewSession = false;
         if (!$session) {
+            $isNewSession = true;
             $session = new Session();
             $session
                 ->setName($sessionKey)
@@ -34,7 +38,7 @@ class ChatManager
             ;
             $this->sessionRepository->save($session, true);
         }
-        return $session;
+        return [$session, $isNewSession];
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Websocket;
 
 use App\Chat\Message;
+use App\Entity\Session;
 use Ratchet\ConnectionInterface;
 
 trait MessageHandlerTrait
@@ -17,7 +18,7 @@ trait MessageHandlerTrait
     {
         $this->operatorConnections->add($connection);
         $message = json_decode($msg);
-        $session = $this->chatManager->getSession($message->session);
+        [$session, $isNewSession] = $this->chatManager->getSession($message->session);
         $message->session = $session;
         $chat = $this->chatManager->addMessage($session, $message);
         $message = json_decode($msg);
@@ -73,7 +74,7 @@ trait MessageHandlerTrait
     public function getHistory(mixed $message, ConnectionInterface $connection): void
     {
         $this->sessionsConnections->add($message->session, $connection);
-        $session = $this->chatManager->getSession($message->session);
+        [$session, $isNewSession] = $this->chatManager->getSession($message->session);
         $chats = $this->chatManager->getChats($session);
         $this->output->writeln('Found messages: ' . count($chats));
         if (count($chats)) {
@@ -101,6 +102,8 @@ trait MessageHandlerTrait
             $this->output->writeln('Sending welcome message');
             $this->sessionsConnections->send($session->getName(), $msg);
             $this->operatorConnections->send($msg);
+
+            $this->operatorNewSession($session);
         }
     }
 
@@ -112,7 +115,7 @@ trait MessageHandlerTrait
      */
     public function operatorGetHistory(mixed $message, ConnectionInterface $connection): void
     {
-        $session = $this->chatManager->getSession($message->session);
+        [$session, $isNewSession] = $this->chatManager->getSession($message->session);
         $chats = $this->chatManager->getChats($session);
         $this->output->writeln('Found messages: ' . count($chats));
         if (count($chats)) {
@@ -140,7 +143,7 @@ trait MessageHandlerTrait
      */
     public function addMessage(mixed $message, ConnectionInterface $connection, string $msg): void
     {
-        $session = $this->chatManager->getSession($message->session);
+        [$session, $isNewSession] = $this->chatManager->getSession($message->session);
         $this->sessionsConnections->add($message->session, $connection);
         $message = json_decode($msg);
         $message->isOperator = false;
@@ -184,6 +187,28 @@ trait MessageHandlerTrait
         ];
         $msg = json_encode($message);
         $connection->send($msg);
+    }
+
+    /**
+     * @param Session $session
+     * @return void
+     * @throws \Exception
+     */
+    public function operatorNewSession(Session $session): void
+    {
+        $message = (object)[
+            'command' => 'new_session',
+            'session' => (object)[
+                'name' => $session->getName(),
+                'id' => $session->getId(),
+                'message_count' => 1,
+                'last_message' => $this->chatDateManager->format(new \DateTime()),
+                'started' => $this->chatDateManager->format(new \DateTime()),
+                'has_new_message' => true,
+            ],
+        ];
+        $msg = json_encode($message);
+        $this->operatorConnections->send($msg);
     }
 
     /**

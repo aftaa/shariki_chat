@@ -40,10 +40,12 @@
         .archive {
             float: right;
             cursor: pointer;
+            display: none;
         }
 
         .new-message {
-            background: lightgreen;
+            background: purple;
+            color: #fff;
         }
 
         .messages {
@@ -169,6 +171,7 @@
                     case 'work_mode': setWorkMode(message.work_mode); break;
                     case 'session': drawSession(message.session); break;
                     case 'new_message': drawMessage(message); break;
+                    case 'new_session': drawSession(message.session, true); break;
                 }
             }
             socket.onerror = function (event) {
@@ -217,7 +220,7 @@
             }
         }, 10000);
 
-        function drawSession(session) {
+        function drawSession(session, prepend) {
             let $div = $('footer .session').clone(true, true);
             $div.attr('id', 'session-' + session.name);
             $('.open', $div).attr('data-session', session.name);
@@ -232,7 +235,11 @@
             if (session.has_new_message) {
                 $div.addClass('new-message');
             }
-            $('main').append($div);
+            if (!prepend) {
+                $('main').append($div);
+            } else {
+                $('main').prepend($div);
+            }
         }
 
         $('.archive').on('click', function (event) {
