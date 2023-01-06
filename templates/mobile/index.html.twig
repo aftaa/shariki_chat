@@ -246,6 +246,7 @@
         })
 
         $('.session .open').on('click', function () {
+            $('#messages-' + this.dataset.session).html('');
             command({
                 command: 'get_op_history',
                 session: this.dataset.session
