@@ -34,6 +34,7 @@
             padding: 5px;
             cursor: pointer;
             border-radius: 10px;
+            background: #eee;
         }
 
         .archive {
@@ -47,32 +48,40 @@
             padding: 10px;
             overflow-y: scroll;
             height: 300px;
+            background: #fff;
         }
+
         .message {
             clear: both;
             margin: 5px;
             float: left;
             max-width: 90%;
         }
+
         .operator {
             float: right;
         }
+
         .text {
             padding: 10px;
             background: #eee;
             border-radius: 10px;
         }
+
         .operator .text {
             background: #22ceb6;
             color: #fff;
         }
+
         .datetime {
             color: gray;
             font-size: 12px;
         }
+
         .form {
             margin: 5px 0;
         }
+
         header {
             overflow: hidden;
         }
@@ -110,11 +119,11 @@
                 <div class="messages">
                     <div class="message visitor">
                         <div class="datetime"></div>
-                        <div class="text">Client message</div>
+                        <div class="text"></div>
                     </div>
                     <div class="message operator">
                         <div class="datetime"></div>
-                        <div class="text">Operator message</div>
+                        <div class="text"></div>
                     </div>
                 </div>
                 <div class="form">
@@ -245,5 +254,6 @@
 
         let width = $('.messages').width();
         $('.form input').width(width - 42);
+        $('footer').hide();
     </script>
 {% endblock %}
