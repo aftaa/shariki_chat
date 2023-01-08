@@ -161,7 +161,6 @@
             socket = new WebSocket(url);
             socket.onopen = function () {
                 setStatus(true);
-                $('main').html('');
                 command({ command: 'get_work_mode' });
                 command({ command: 'get_sessions' });
             }
@@ -177,9 +176,11 @@
             }
             socket.onerror = function (event) {
                 setStatus(false);
+                $('main').html('');
             }
             socket.onclose = function (event) {
                 setStatus(false);
+                $('main').html('');
             }
         }
 
@@ -304,7 +305,9 @@
                 isOperator: true
             });
 
-            $('#session-' + session).prependTo('main');
+            if ($('main .session:first').attr('id') !== 'session-' + session) {
+                $('#session-' + session).prependTo('main');
+            }
         }
 
         function updateSession(message) {
