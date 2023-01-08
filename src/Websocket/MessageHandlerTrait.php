@@ -34,6 +34,28 @@ trait MessageHandlerTrait
         ];
         $msg = json_encode($message);
         $this->sessionsConnections->send($session->getName(), $msg);
+
+        $this->operatorUpdateSession($session->getName());
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function operatorUpdateSession(string $sessionName): void
+    {
+        $data = $this->operatorManager->getSessionData($sessionName);
+        if (false === $data) {
+            $this->output->writeln("Session $sessionName not found");
+            return;
+        }
+        $message = (object)[
+            'command' => 'upd_session',
+            'session' => $sessionName,
+            'last_message' => $this->chatDateManager->format($data['last_message']),
+            'message_count' => $data['message_count'],
+        ];
+        $msg = json_encode($message);
+        $this->operatorConnections->send($msg);
     }
 
     /**
@@ -170,6 +192,8 @@ trait MessageHandlerTrait
             $this->operatorConnections->send($msg);
             $this->sessionsConnections->send($session->getName(), $msg);
         }
+
+        $this->operatorUpdateSession($session->getName());
     }
 
     /**
@@ -201,7 +225,7 @@ trait MessageHandlerTrait
             'session' => (object)[
                 'name' => $session->getName(),
                 'id' => $session->getId(),
-                'message_count' => 1,
+                'message_count' => 2,
                 'last_message' => $this->chatDateManager->format(new \DateTime()),
                 'started' => $this->chatDateManager->format(new \DateTime()),
                 'has_new_message' => true,

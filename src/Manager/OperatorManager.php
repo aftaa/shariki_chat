@@ -51,4 +51,12 @@ class OperatorManager
         $workMode->setWorkMode($newWorkMode);
         $this->workModeRepository->save($workMode, true);
     }
+
+    /**
+     * @throws Exception
+     */
+    public function getSessionData(string $sessionName): false|array
+    {
+        return $this->sessionRepository->getSessionData($sessionName);
+    }
 }

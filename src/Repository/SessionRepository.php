@@ -83,4 +83,26 @@ class SessionRepository extends ServiceEntityRepository
         $resultSet = $stmt->executeQuery();
         return $resultSet->fetchAllAssociative();
     }
+
+    /**
+     * @param string $sessionName
+     * @return array|false
+     * @throws Exception
+     */
+    public function getSessionData(string $sessionName): array|false
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        echo $sql = '
+            SELECT 
+                (SELECT created FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) AS last_message,
+                (SELECT COUNT(*) FROM chat WHERE s.id=session_id) AS message_count
+            FROM session s
+            WHERE s.name = "' . $sessionName . '"
+        ';
+
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        return $resultSet->fetchAssociative();
+    }
 }

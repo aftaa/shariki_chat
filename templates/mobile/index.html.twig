@@ -172,6 +172,7 @@
                     case 'session': drawSession(message.session); break;
                     case 'new_message': drawMessage(message); break;
                     case 'new_session': drawSession(message.session, true); break;
+                    case 'upd_session': updateSession(message); break;
                 }
             }
             socket.onerror = function (event) {
@@ -304,6 +305,15 @@
             });
 
             $('#session-' + session).prependTo('main');
+        }
+
+        function updateSession(message) {
+            console.log(message);
+            let $div = $('#session-' + message.session);
+            if ($div.length) {
+                $('.message-count', $div).html(message.message_count);
+                $('.last-message', $div).html(message.last_message);
+            }
         }
 
         let width = $('.messages').width();
