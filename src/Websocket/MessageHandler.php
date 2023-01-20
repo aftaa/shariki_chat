@@ -33,7 +33,16 @@ class MessageHandler implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
-        $this->output->writeln('New connection');
+        $queryString = $conn->httpRequest->getUri()->getQuery();
+        parse_str($queryString, $params);
+        if (array_key_exists('operator', $params)) {
+            $this->output->writeln('New operator connection');
+            $this->operatorConnections->add($conn);
+        }
+        if (array_key_exists('session', $params)) {
+            $this->output->writeln('New session connection ' . $params['session']);
+            $this->sessionsConnections->add($params['session'], $conn);
+        }
     }
 
     public function onMessage(ConnectionInterface $connection, $msg)

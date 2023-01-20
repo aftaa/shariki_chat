@@ -16,7 +16,6 @@ trait MessageHandlerTrait
      */
     public function operatorAddMessage(ConnectionInterface $connection, string $msg): void
     {
-        $this->operatorConnections->add($connection);
         $message = json_decode($msg);
         [$session, $isNewSession] = $this->chatManager->getSession($message->session);
         $message->session = $session;
@@ -66,8 +65,6 @@ trait MessageHandlerTrait
      */
     public function operatorGetSessions(ConnectionInterface $connection): void
     {
-        $this->operatorConnections->add($connection);
-
         $sessions = $this->operatorManager->getSessions();
         $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
         foreach ($sessions as $session) {
@@ -95,7 +92,6 @@ trait MessageHandlerTrait
      */
     public function getHistory(mixed $message, ConnectionInterface $connection): void
     {
-        $this->sessionsConnections->add($message->session, $connection);
         [$session, $isNewSession] = $this->chatManager->getSession($message->session);
         $chats = $this->chatManager->getChats($session);
         $this->output->writeln('Found messages: ' . count($chats));
@@ -166,7 +162,6 @@ trait MessageHandlerTrait
     public function addMessage(mixed $message, ConnectionInterface $connection, string $msg): void
     {
         [$session, $isNewSession] = $this->chatManager->getSession($message->session);
-        $this->sessionsConnections->add($message->session, $connection);
         $message = json_decode($msg);
         $message->isOperator = false;
         $message->session = $session;
