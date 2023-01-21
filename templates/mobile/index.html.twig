@@ -161,17 +161,27 @@
             socket = new WebSocket(url);
             socket.onopen = function () {
                 setStatus(true);
-                command({ command: 'get_work_mode' });
-                command({ command: 'get_sessions' });
+                command({command: 'get_work_mode'});
+                command({command: 'get_sessions'});
             }
             socket.onmessage = function (event) {
                 let message = JSON.parse(event.data);
                 switch (message.command) {
-                    case 'work_mode': setWorkMode(message.work_mode); break;
-                    case 'session': drawSession(message.session); break;
-                    case 'new_message': drawMessage(message); break;
-                    case 'new_session': drawSession(message.session, true); break;
-                    case 'upd_session': updateSession(message); break;
+                    case 'work_mode':
+                        setWorkMode(message.work_mode);
+                        break;
+                    case 'session':
+                        drawSession(message.session);
+                        break;
+                    case 'new_message':
+                        drawMessage(message);
+                        break;
+                    case 'new_session':
+                        drawSession(message.session, true);
+                        break;
+                    case 'upd_session':
+                        updateSession(message);
+                        break;
                 }
             }
             socket.onerror = function (event) {
@@ -189,8 +199,11 @@
         function setWorkMode(workMode) {
             let select = document.getElementById('work-mode');
             switch (workMode) {
-                case 'bot': select.selectedIndex = 0; break;
-                case 'operator': select.selectedIndex = 1;
+                case 'bot':
+                    select.selectedIndex = 0;
+                    break;
+                case 'operator':
+                    select.selectedIndex = 1;
             }
             $(select).show();
         }
@@ -198,8 +211,11 @@
         $('#work-mode').on('change', function () {
             let workMode;
             switch (this.selectedIndex) {
-                case 0: workMode = 'bot'; break;
-                case 1: workMode = 'operator';
+                case 0:
+                    workMode = 'bot';
+                    break;
+                case 1:
+                    workMode = 'operator';
             }
             command({
                 command: 'set_work_mode',
@@ -275,7 +291,7 @@
             let chatMessages = document.getElementById("messages-" + session);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        
+
         $('button').on('click', function () {
             let session = this.dataset.session;
             let text = $('#text-' + session).val();

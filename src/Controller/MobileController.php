@@ -12,7 +12,7 @@ class MobileController extends AbstractController
     public function index(): Response
     {
         return $this->render('mobile/index.html.twig', [
-            'local' =>'shariki-chat' === $_SERVER['SERVER_NAME'],
+            'local' =>'localhost' === $_SERVER['SERVER_NAME'],
         ]);
     }
 }
