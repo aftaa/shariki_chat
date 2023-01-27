@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Minishlink\WebPush\Subscription;
+use Minishlink\WebPush\VAPID;
 use Minishlink\WebPush\WebPush;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,12 @@ class WebNotificationController extends AbstractController
     public function index(): Response
     {
         return $this->render('web_notification/index.html.twig');
+    }
+
+    #[Route('/index1', name: 'app_web_notification_index1')]
+    public function index1(): Response
+    {
+        return $this->render('web_notification/index1.html.twig');
     }
 
     /**
@@ -78,6 +85,49 @@ class WebNotificationController extends AbstractController
                 echo "Error: method not handled";
                 return new Response('');
         }
+        return new Response('');
+    }
+
+    #[Route('/push1', name: 'app_webnotification_push1')]
+    public function push1(): Response
+    {
+// (B) GET SUBSCRIPTION
+        $sub = Subscription::create(json_decode($_REQUEST["sub"], true));
+        $message = $_REQUEST['message'];
+
+// (C) NEW WEB PUSH OBJECT - CHANGE TO YOUR OWN!
+        $push = new WebPush(["VAPID" => [
+            "subject" => "after@ya.ru",
+            'publicKey' => file_get_contents(__DIR__ . '/../../etc/keys/public_key.txt'),
+            'privateKey' => file_get_contents(__DIR__ . '/../../etc/keys/private_key.txt'),
+        ]]);
+
+// (D) SEND TEST PUSH NOTIFICATION
+        $result = $push->sendOneNotification($sub, json_encode([
+            "title" => "Новое сообщение",
+            "body" => $message,
+//            "icon" => "i-loud.png",
+//            "image" => "i-cover.png"
+        ]));
+        $endpoint = $result->getRequest()->getUri()->__toString();
+
+// (E) HANDLE RESULT - OPTIONAL
+        if ($result->isSuccess()) {
+            // echo "Successfully sent {$endpoint}.";
+        } else {
+            // echo "Send failed {$endpoint}: {$result->getReason()}";
+            // $result->getRequest();
+            // $result->getResponse();
+            // $result->isSubscriptionExpired();
+        }
+
+        return new Response('');
+    }
+
+    #[Route('/vapid', name: 'app_webnotification_createkeys')]
+    public function createKeys(): Response
+    {
+        print_r(VAPID::createVapidKeys());
         return new Response('');
     }
 }

@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<script>
+    // (A) OBTAIN USER PERMISSION TO SHOW NOTIFICATION
+    console.log('test')
+    window.onload = () => {
+        // (A1) ASK FOR PERMISSION
+        if (Notification.permission === "default") {
+            Notification.requestPermission().then(perm => {
+                if (Notification.permission === "granted") {
+                    console.log('granted')
+                } else {
+                    alert("Please allow notifications.");
+                }
+            });
+        }
+
+        // (A2) GRANTED
+        else if (Notification.permission === "granted") {
+            console.log('granted')
+        }
+
+        // (A3) DENIED
+        else { alert("Please allow notifications."); }
+    };
+
+    // (B) REGISTER SERVICE WORKER
+    async function regWorker () {
+        // (B1) YOUR PUBLIC KEY - CHANGE TO YOUR OWN!
+        const publicKey = "BLEju4fZBvCwAJya8gG9rIqwgKpgqQPHPMk6BOwEyDei-2blAOU2yI3v04wp5d1ktwqdz1F8KTB1GfVUkFEMADE";
+
+        // (B2) REGISTER SERVICE WORKER
+        navigator.serviceWorker.register("/sw1.js", {scope: "/"});
+
+        // (B3) SUBSCRIBE TO PUSH SERVER
+        navigator.serviceWorker.ready
+            .then(reg => {
+                reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: publicKey
+                }).then(
+                    // (B3-1) OK - TEST PUSH NOTIFICATION
+                    sub => {
+                        var data = new FormData();
+                        data.append("sub", JSON.stringify(sub));
+                        fetch("/web-notification/push1", { method: "POST", body : data })
+                            .then(res => res.text())
+                            .then(txt => console.log(txt))
+                            .catch(err => console.error(err));
+                    },
+
+                    // (B3-2) ERROR!
+                    err => console.error(err)
+                );
+            });
+    }
+</script>
+{% endblock %}

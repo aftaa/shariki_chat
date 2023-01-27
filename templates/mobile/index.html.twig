@@ -285,6 +285,10 @@
             } else {
                 $('#session-' + message.session).addClass('new-message').prependTo('main');
             }
+
+            if (message.push_notification) {
+                regWorker(message.message);
+            }
         }
 
         function scrollToBottom(session) {
@@ -338,61 +342,61 @@
         let width = $('.messages').width();
         $('.form input').width(width - 42);
         $('footer').hide();
-
-        function checkNotificationPermission() {
-            return new Promise((fulfilled, reject) => {
-                if (Notification.permission === 'denied') {
-                    return reject(new Error('Push messages are blocked.'));
-                }
-                if (Notification.permission === 'granted') {
-                    return fulfilled();
-                }
-                if (Notification.permission === 'default') {
-                    return Notification.requestPermission().then(result => {
-                        if (result !== 'granted') {
-                            reject(new Error('Bad permission result'));
-                        } else {
-                            fulfilled();
-                        }
-                    });
-                }
-                return reject(new Error('Unknown permission'));
-            });
-        }
     </script>
 
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script>
+        // (A) OBTAIN USER PERMISSION TO SHOW NOTIFICATION
+        window.onload = () => {
+            // (A1) ASK FOR PERMISSION
+            if (Notification.permission === "default") {
+                Notification.requestPermission().then(perm => {
+                    if (Notification.permission === "granted") {
+                        console.log('granted')
+                    } else {
+                        alert("Please allow notifications.");
+                    }
+                });
+            }
 
-    <script type="module">
-        // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
-        // import {
-        //     getMessaging,
-        //     onBackgroundMessage
-        // } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-messaging-sw.js";
-        //
-        // const firebaseConfig = {
-        //     apiKey: "AIzaSyDr7vST1FH052gV1SkhIGAkNwA3ZRYYCjE",
-        //     authDomain: "shariki-chat.firebaseapp.com",
-        //     projectId: "shariki-chat",
-        //     storageBucket: "shariki-chat.appspot.com",
-        //     messagingSenderId: "512429993208",
-        //     appId: "1:512429993208:web:341a23dc2e9a3f54b4df0d"
-        // };
-        //
-        // const firebaseApp = initializeApp(firebaseConfig);
-        // const messaging = getMessaging(firebaseApp);
-        //
-        // onBackgroundMessage(messaging, (payload) => {
-        //     console.log('[firebase-messaging-sw.js] Received background message ', payload);
-        //     // Customize notification here
-        //     const notificationTitle = 'Background Message Title';
-        //     const notificationOptions = {
-        //         body: 'Background Message body.',
-        //         icon: '/firebase-logo.png'
-        //     };
-        //
-        //     self.registration.showNotification(notificationTitle,
-        //         notificationOptions);
-        // });
+            // (A2) GRANTED
+            else if (Notification.permission === "granted") {
+                console.log('granted')
+            }
+
+            // (A3) DENIED
+            else { alert("Please allow notifications."); }
+        };
+
+        // (B) REGISTER SERVICE WORKER
+        async function regWorker (message) {
+            // (B1) YOUR PUBLIC KEY - CHANGE TO YOUR OWN!
+            const publicKey = "BLEju4fZBvCwAJya8gG9rIqwgKpgqQPHPMk6BOwEyDei-2blAOU2yI3v04wp5d1ktwqdz1F8KTB1GfVUkFEMADE";
+
+            // (B2) REGISTER SERVICE WORKER
+            navigator.serviceWorker.register("/sw1.js", {scope: "/"});
+
+            // (B3) SUBSCRIBE TO PUSH SERVER
+            navigator.serviceWorker.ready
+                .then(reg => {
+                    reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: publicKey
+                    }).then(
+                        // (B3-1) OK - TEST PUSH NOTIFICATION
+                        sub => {
+                            var data = new FormData();
+                            data.append("sub", JSON.stringify(sub));
+                            data.append("message", message);
+                            fetch("/web-notification/push1", { method: "POST", body : data })
+                                .then(res => res.text())
+                                .then(txt => console.log(txt))
+                                .catch(err => console.error(err));
+                        },
+
+                        // (B3-2) ERROR!
+                        err => console.error(err)
+                    );
+                });
+        }
     </script>
 {% endblock %}

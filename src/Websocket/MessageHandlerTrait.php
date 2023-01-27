@@ -169,6 +169,7 @@ trait MessageHandlerTrait
         $message->created = $this->chatDateManager->format($chat->getCreated());
         $message = json_decode($msg);
         $message->command = 'new_message';
+        $message->push_notification = true;
         $msg = json_encode($message);
         $this->sessionsConnections->send($session->getName(), $msg);
         $this->operatorConnections->send($msg);
