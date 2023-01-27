@@ -286,7 +286,7 @@
                 $('#session-' + message.session).addClass('new-message').prependTo('main');
             }
 
-            if (message.push_notification) {
+            if (message.push_notification && document.hidden) {
                 regWorker(message.message);
             }
         }
