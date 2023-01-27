@@ -359,40 +359,40 @@
                 return reject(new Error('Unknown permission'));
             });
         }
-
-        checkNotificationPermission();
     </script>
 
+    <script src="{{ asset('js/app.js') }}"></script>
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
-        import {
-            getMessaging,
-            onBackgroundMessage
-        } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-messaging-sw.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDr7vST1FH052gV1SkhIGAkNwA3ZRYYCjE",
-            authDomain: "shariki-chat.firebaseapp.com",
-            projectId: "shariki-chat",
-            storageBucket: "shariki-chat.appspot.com",
-            messagingSenderId: "512429993208",
-            appId: "1:512429993208:web:341a23dc2e9a3f54b4df0d"
-        };
-
-        const firebaseApp = initializeApp(firebaseConfig);
-        const messaging = getMessaging(firebaseApp);
-
-        onBackgroundMessage(messaging, (payload) => {
-            console.log('[firebase-messaging-sw.js] Received background message ', payload);
-            // Customize notification here
-            const notificationTitle = 'Background Message Title';
-            const notificationOptions = {
-                body: 'Background Message body.',
-                icon: '/firebase-logo.png'
-            };
-
-            self.registration.showNotification(notificationTitle,
-                notificationOptions);
-        });
+        // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js";
+        // import {
+        //     getMessaging,
+        //     onBackgroundMessage
+        // } from "https://www.gstatic.com/firebasejs/9.16.0/firebase-messaging-sw.js";
+        //
+        // const firebaseConfig = {
+        //     apiKey: "AIzaSyDr7vST1FH052gV1SkhIGAkNwA3ZRYYCjE",
+        //     authDomain: "shariki-chat.firebaseapp.com",
+        //     projectId: "shariki-chat",
+        //     storageBucket: "shariki-chat.appspot.com",
+        //     messagingSenderId: "512429993208",
+        //     appId: "1:512429993208:web:341a23dc2e9a3f54b4df0d"
+        // };
+        //
+        // const firebaseApp = initializeApp(firebaseConfig);
+        // const messaging = getMessaging(firebaseApp);
+        //
+        // onBackgroundMessage(messaging, (payload) => {
+        //     console.log('[firebase-messaging-sw.js] Received background message ', payload);
+        //     // Customize notification here
+        //     const notificationTitle = 'Background Message Title';
+        //     const notificationOptions = {
+        //         body: 'Background Message body.',
+        //         icon: '/firebase-logo.png'
+        //     };
+        //
+        //     self.registration.showNotification(notificationTitle,
+        //         notificationOptions);
+        // });
     </script>
 {% endblock %}
