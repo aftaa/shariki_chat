@@ -59,4 +59,9 @@ class OperatorManager
     {
         return $this->sessionRepository->getSessionData($sessionName);
     }
+
+    public function ping(): void
+    {
+        $this->workModeRepository->find(1);
+    }
 }

@@ -86,6 +86,10 @@ class MessageHandler implements MessageComponentInterface
                 case 'save_timeout_message':
                     $this->saveTimeoutMessage($message); // returns command 'timeout_message'
                     break;
+                case 'ping':
+                    $this->output->writeln('[ ping pong ]');
+                    $this->operatorManager->ping();
+                    break;
             }
         } catch (\Exception $exception) {
             $this->output->writeln(

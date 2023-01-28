@@ -196,6 +196,8 @@
 
         connect();
 
+        setInterval(() => command({command: 'ping'}), 30000);
+
         function setWorkMode(workMode) {
             let select = document.getElementById('work-mode');
             switch (workMode) {
