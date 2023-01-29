@@ -104,7 +104,7 @@ class WebNotificationController extends AbstractController
 
 // (D) SEND TEST PUSH NOTIFICATION
         $result = $push->sendOneNotification($sub, json_encode([
-            "title" => "Сообщение в чате",
+            "title" => "Шарики-чат",
             "body" => $message,
 //            "icon" => "i-loud.png",
 //            "image" => "i-cover.png"
