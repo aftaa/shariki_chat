@@ -2,7 +2,6 @@
 
 namespace App\Websocket;
 
-use App\Chat\Message;
 use App\Manager\ChatDateManager;
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
