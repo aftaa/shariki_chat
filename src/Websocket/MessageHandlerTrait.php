@@ -95,6 +95,10 @@ trait MessageHandlerTrait
         [$session, $isNewSession] = $this->chatManager->getSession($message->session);
         $chats = $this->chatManager->getChats($session);
         $this->output->writeln('Found messages: ' . count($chats));
+
+        $time = date('H:i');
+        $autoChatOpen = $time >= '09:00' && $time < '21:00';
+
         if (count($chats)) {
             foreach ($chats as $chat) {
                 $message = new Message(
@@ -107,7 +111,7 @@ trait MessageHandlerTrait
                 $msg = json_encode($message);
                 $this->sessionsConnections->send($message->session, $msg);
             }
-        } else {
+        } elseif ($autoChatOpen) {
             $answer = new Message(
                 name: 'Чат-бот',
                 message: $this->chatManager->botWelcomeMessage(),
