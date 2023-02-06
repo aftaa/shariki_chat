@@ -185,7 +185,7 @@ trait MessageHandlerTrait
             $email = (new Email())
                 ->from('info@gelievyeshari24.ru')
                 ->addTo('mail@max-after.ru')
-                ->subject('Шарики-чат')
+                ->subject('Новый чат')
                 ->text($message->message);
             $this->mailer->send($email);
         }
