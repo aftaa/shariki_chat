@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
     name: 'app:websocket-server',
@@ -28,6 +29,7 @@ class WebsocketServerCommand extends Command
     public function __construct(
         private readonly ChatManager     $chatManager,
         private readonly OperatorManager $operatorManager,
+        private readonly MailerInterface $mailer,
     )
     {
         parent::__construct();
@@ -48,6 +50,7 @@ class WebsocketServerCommand extends Command
                         $this->chatManager,
                         $this->operatorManager,
                         $output,
+                        $this->mailer,
                     )
                 )
             ),

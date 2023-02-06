@@ -8,6 +8,7 @@ use App\Manager\OperatorManager;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mailer\MailerInterface;
 
 class MessageHandler implements MessageComponentInterface
 {
@@ -23,6 +24,7 @@ class MessageHandler implements MessageComponentInterface
         private readonly ChatManager       $chatManager,
         private readonly OperatorManager   $operatorManager,
         private readonly OutputInterface   $output,
+        private readonly MailerInterface   $mailer,
         private readonly ConnectionManager $operatorConnections = new ConnectionManager(),
         private readonly SessionManager    $sessionsConnections = new SessionManager(),
         private readonly ChatDateManager   $chatDateManager = new ChatDateManager(),

@@ -105,4 +105,14 @@ class ChatManager
         $message->setText($timeoutMessage);
         $this->messageRepository->save($message, true);
     }
+
+    /**
+     * @param Session $session
+     * @return bool
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function isNewChat(Session $session): bool
+    {
+        return $this->chatRepository->isNewChat($session);
+    }
 }

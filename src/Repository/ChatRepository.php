@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Chat;
 use App\Entity\Session;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -52,5 +53,23 @@ class ChatRepository extends ServiceEntityRepository
             ->setParameter(':session', $session);
         $query = $qb->getQuery();
         return $query->execute();
+    }
+
+    /**
+     * @param Session $session
+     * @return bool
+     * @throws Exception
+     */
+    public function isNewChat(Session $session): bool
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "
+            SELECT COUNT(*) AS chat_count FROM chat
+            WHERE name = 'Вы' AND session_id={$session->getId()}
+        ";
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        $resultSet = $resultSet->fetchAssociative();
+        return 1 == $resultSet['chat_count'];
     }
 }

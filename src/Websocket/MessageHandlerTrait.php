@@ -5,6 +5,8 @@ namespace App\Websocket;
 use App\Chat\Message;
 use App\Entity\Session;
 use Ratchet\ConnectionInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Email;
 
 trait MessageHandlerTrait
 {
@@ -162,6 +164,7 @@ trait MessageHandlerTrait
      * @param string $msg
      * @return void
      * @throws \Exception
+     * @throws TransportExceptionInterface
      */
     public function addMessage(mixed $message, ConnectionInterface $connection, string $msg): void
     {
@@ -177,6 +180,15 @@ trait MessageHandlerTrait
         $msg = json_encode($message);
         $this->sessionsConnections->send($session->getName(), $msg);
         $this->operatorConnections->send($msg);
+
+        if ($this->chatManager->isNewChat($session)) {
+            $email = (new Email())
+                ->from('info@gelievyeshari24.ru')
+                ->addTo('mail@max-after.ru')
+                ->subject('Шарики-чат')
+                ->text($message->message);
+            $this->mailer->send($email);
+        }
 
         if ('bot' === $this->operatorManager->getWorkMode()) {
             $message = new Message(
