@@ -70,6 +70,9 @@ trait MessageHandlerTrait
         $sessions = $this->operatorManager->getSessions();
         $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
         foreach ($sessions as $session) {
+            if ($session['timediff'] > 3600 * 24) {
+                continue;
+            }
             $msg = (object)[
                 'command' => 'session',
                 'session' => (object)[
