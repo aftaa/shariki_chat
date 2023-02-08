@@ -5,10 +5,15 @@ namespace App\Manager;
 class ChatDateManager
 {
     /**
+     * @param string|\DateTimeInterface|null $datetime
+     * @return string
      * @throws \Exception
      */
-    public function format(string|\DateTimeInterface $datetime): string
+    public function format(?string|\DateTimeInterface $datetime): string
     {
+        if (null === $datetime) {
+            return '-';
+        }
         if (!$datetime instanceof \DateTimeInterface) {
             $date = new \DateTime($datetime);
         } else {
