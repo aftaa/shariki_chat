@@ -73,12 +73,16 @@ trait MessageHandlerTrait
             if ($session['timediff'] > 3600 * 24) {
                 continue;
             }
+            $format = $this->chatDateManager->format($session['last_message']);
+            if ('-' === $format) {
+                continue;
+            }
             $msg = (object)[
                 'command' => 'session',
                 'session' => (object)[
                     'name' => $session['session'],
                     'id' => $session['id'],
-                    'last_message' => $this->chatDateManager->format($session['last_message']),
+                    'last_message' => $format,
                     'started' => $this->chatDateManager->format($session['started']),
                     'message_count' => $session['message_count'],
                     'has_new_message' => $session['has_new_message'],
