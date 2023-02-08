@@ -9,7 +9,7 @@ class ChatDateManager
      * @return string
      * @throws \Exception
      */
-    public function format(?string|\DateTimeInterface $datetime): string
+    public function format(null|string|\DateTimeInterface $datetime): string
     {
         if (null === $datetime) {
             return '-';
