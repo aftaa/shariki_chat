@@ -36,13 +36,19 @@ class OperatorManager
      */
     public function getWorkMode(): string
     {
-        $workMode = $this->workModeRepository->find(1);
-        if (!$workMode) {
-            $workMode = new WorkMode();
-            $workMode->setWorkMode(self::DEFAULT_WORK_MODE);
-            $this->workModeRepository->save($workMode, true);
+        $time = date('H:i');
+        if ($time >= '09:00' && $time < '21:00') {
+            return 'operator';
+        } else {
+            return 'bot';
         }
-        return $workMode->getWorkMode();
+//        $workMode = $this->workModeRepository->find(1);
+//        if (!$workMode) {
+//            $workMode = new WorkMode();
+//            $workMode->setWorkMode(self::DEFAULT_WORK_MODE);
+//            $this->workModeRepository->save($workMode, true);
+//        }
+//        return $workMode->getWorkMode();
     }
 
     public function setWorkMode(string $newWorkMode): void
