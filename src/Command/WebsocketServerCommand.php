@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
+use App\Manager\WebPushManager;
 use App\Repository\ChatRepository;
 use App\Repository\SessionRepository;
 use App\Websocket\MessageHandler;
@@ -30,6 +31,7 @@ class WebsocketServerCommand extends Command
         private readonly ChatManager     $chatManager,
         private readonly OperatorManager $operatorManager,
         private readonly MailerInterface $mailer,
+        private readonly WebPushManager  $pushManager,
     )
     {
         parent::__construct();
@@ -51,6 +53,7 @@ class WebsocketServerCommand extends Command
                         $this->operatorManager,
                         $output,
                         $this->mailer,
+                        $this->pushManager,
                     )
                 )
             ),

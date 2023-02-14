@@ -5,6 +5,7 @@ namespace App\Websocket;
 use App\Manager\ChatDateManager;
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
+use App\Manager\WebPushManager;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,12 +20,12 @@ class MessageHandler implements MessageComponentInterface
      */
     private array $sessions = [];
 
-
     public function __construct(
         private readonly ChatManager       $chatManager,
         private readonly OperatorManager   $operatorManager,
         private readonly OutputInterface   $output,
         private readonly MailerInterface   $mailer,
+        private readonly WebPushManager    $pushManager,
         private readonly ConnectionManager $operatorConnections = new ConnectionManager(),
         private readonly SessionManager    $sessionsConnections = new SessionManager(),
         private readonly ChatDateManager   $chatDateManager = new ChatDateManager(),

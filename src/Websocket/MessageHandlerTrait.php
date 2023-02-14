@@ -188,6 +188,10 @@ trait MessageHandlerTrait
         $this->sessionsConnections->send($session->getName(), $msg);
         $this->operatorConnections->send($msg);
 
+        if ($message->push_notification) {
+            $this->pushManager->webPushSend($message->message);
+        }
+
         if ($this->chatManager->isNewChat($session)) {
             $email = (new Email())
                 ->from('info@gelievyeshari24.ru')

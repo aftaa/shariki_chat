@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\PushSub;
+use App\Repository\PushSubRepository;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\VAPID;
 use Minishlink\WebPush\WebPush;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -89,9 +92,33 @@ class WebNotificationController extends AbstractController
     }
 
     #[Route('/push1', name: 'app_webnotification_push1')]
-    public function push1(): Response
+    public function push1(Request $request, PushSubRepository $pushSubRepository): Response
     {
 // (B) GET SUBSCRIPTION
+
+        $sub = $request->get('sub');
+        $pushSub = $pushSubRepository->findBy(['name' => $sub]);
+        if (!$pushSub) {
+            $pushSub = new PushSub();
+            $pushSub->setName($sub);
+            $pushSubRepository->save($pushSub, true);
+        }
+        return new Response('');
+    }
+
+    #[Route('/vapid', name: 'app_webnotification_createkeys')]
+    public function createKeys(): Response
+    {
+        print_r(VAPID::createVapidKeys());
+        return new Response('');
+    }
+
+    /**
+     * @return void
+     * @throws \ErrorException
+     */
+    public function addToDb(): void
+    {
         $sub = Subscription::create(json_decode($_REQUEST["sub"], true));
         $message = $_REQUEST['message'];
 
@@ -120,14 +147,5 @@ class WebNotificationController extends AbstractController
             // $result->getResponse();
             // $result->isSubscriptionExpired();
         }
-
-        return new Response('');
-    }
-
-    #[Route('/vapid', name: 'app_webnotification_createkeys')]
-    public function createKeys(): Response
-    {
-        print_r(VAPID::createVapidKeys());
-        return new Response('');
     }
 }
