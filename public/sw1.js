@@ -11,7 +11,7 @@ self.addEventListener("push", evt => {
     self.registration.showNotification(data.title, {
         body: data.body,
         data: {
-            url: JSON.parse(data).url
+            url: data.url
         }
     });
 });
