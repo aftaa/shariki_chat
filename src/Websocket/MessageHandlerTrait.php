@@ -195,8 +195,7 @@ trait MessageHandlerTrait
         if ($this->chatManager->isNewChat($session)) {
             $email = (new Email())
                 ->from('info@gelievyeshari24.ru')
-//                ->addTo('info@gelievyeshari24.ru', 'mail@max-after.ru')
-                ->addTo('mail@max-after.ru')
+                ->addTo('info@gelievyeshari24.ru', 'mail@max-after.ru')
                 ->subject('Новый чат')
                 ->text($message->message);
             $this->mailer->send($email);
