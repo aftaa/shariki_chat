@@ -2,12 +2,10 @@
 
 namespace App\Repository;
 
-use App\Entity\Chat;
 use App\Entity\Session;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -75,7 +73,9 @@ class SessionRepository extends ServiceEntityRepository
             (SELECT NOT is_operator FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
                 OR 
             (SELECT "Чат-бот" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
-                AS has_new_message 
+                AS has_new_message, 
+            (SELECT "Вы" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
+                AS has_new_message1 
             FROM session s 
             ORDER BY last_message DESC
         ';

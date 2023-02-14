@@ -333,7 +333,6 @@
         }
 
         function updateSession(message) {
-            console.log(message);
             let $div = $('#session-' + message.session);
             if ($div.length) {
                 $('.message-count', $div).html(message.message_count);
