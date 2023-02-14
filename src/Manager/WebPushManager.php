@@ -35,6 +35,7 @@ readonly class WebPushManager
             $push->sendOneNotification($subscription, json_encode([
                 'title' => 'Шарики-чат',
                 'body' => $message,
+                'url' => 'https://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai/',
             ]));
         }
     }

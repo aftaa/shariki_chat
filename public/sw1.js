@@ -9,6 +9,9 @@ self.addEventListener("push", evt => {
     const data = evt.data.json();
     console.log("Push", data);
     self.registration.showNotification(data.title, {
-        body: data.body
+        body: data.body,
+        data: {
+            url: JSON.parse(data).url
+        }
     });
 });
