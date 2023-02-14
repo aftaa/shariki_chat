@@ -193,9 +193,14 @@ trait MessageHandlerTrait
         }
 
         if ($this->chatManager->isNewChat($session)) {
+            if ('localhost' === $_SERVER['SERVER_NAME']) {
+                $emailTo = ['mail@max-after.ru'];
+            } else {
+                $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
+            }
             $email = (new Email())
                 ->from('info@gelievyeshari24.ru')
-                ->addTo('info@gelievyeshari24.ru', 'mail@max-after.ru')
+                ->addTo(...$emailTo)
                 ->subject('Новый чат')
                 ->text($message->message);
             $this->mailer->send($email);
@@ -248,7 +253,7 @@ trait MessageHandlerTrait
             'session' => (object)[
                 'name' => $session->getName(),
                 'id' => $session->getId(),
-                'message_count' => 2,
+                'message_count' => 1,
                 'last_message' => $this->chatDateManager->format(new \DateTime()),
                 'started' => $this->chatDateManager->format(new \DateTime()),
                 'has_new_message' => true,
