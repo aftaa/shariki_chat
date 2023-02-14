@@ -3,8 +3,6 @@
 namespace App\Manager;
 
 use App\Entity\Session;
-use App\Entity\WorkMode;
-use App\Enum\WorkModeEnum;
 use App\Repository\ChatRepository;
 use App\Repository\SessionRepository;
 use App\Repository\WorkModeRepository;

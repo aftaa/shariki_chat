@@ -78,9 +78,9 @@ trait MessageHandlerTrait
                 continue;
             }
 
-            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
-                continue;
-            }
+//            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
+//                continue;
+//            }
 
             $msg = (object)[
                 'command' => 'session',
