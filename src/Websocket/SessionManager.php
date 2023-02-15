@@ -26,12 +26,15 @@ class SessionManager
 
     /**
      * @param ConnectionInterface $connection
-     * @return void
+     * @return string|false
      */
-    public function del(ConnectionInterface $connection): void
+    public function del(ConnectionInterface $connection): string|false
     {
         foreach ($this->sessions as $session => $connectionManager) {
-            $connectionManager->del($connection);
+            if ($connectionManager->del($connection)) {
+                return $session;
+            }
+            return false;
         }
     }
 

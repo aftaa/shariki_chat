@@ -4,7 +4,6 @@ namespace App\Manager;
 
 use App\Repository\PushSubRepository;
 use Minishlink\WebPush\Subscription;
-use Minishlink\WebPush\VAPID;
 use Minishlink\WebPush\WebPush;
 
 readonly class WebPushManager
@@ -29,7 +28,7 @@ readonly class WebPushManager
     {
         $subs = $this->pushSubRepository->findAll();
         foreach ($subs as $sub) {
-            echo $name = $sub->getName();
+            $name = $sub->getName();
             $subscription = Subscription::create(json_decode($name, true));
             $push = new WebPush(['VAPID' => $this->auth]);
             $push->sendOneNotification($subscription, json_encode([

@@ -33,14 +33,16 @@ class ConnectionManager
 
     /**
      * @param ConnectionInterface $delConn
-     * @return void
+     * @return bool
      */
-    public function del(ConnectionInterface $delConn): void
+    public function del(ConnectionInterface $delConn): bool
     {
         $key = array_search($delConn, $this->connections, true);
         if (false !== $key) {
             unset($this->connections[$key]);
+            return true;
         }
+        return false;
     }
 
     /**

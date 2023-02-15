@@ -108,9 +108,7 @@ class MessageHandler implements MessageComponentInterface
      */
     public function onClose(ConnectionInterface $conn): void
     {
-        $this->operatorConnections->del($conn);
-        $this->sessionsConnections->del($conn);
-        $this->output->writeln('Close connection');
+        $this->closeConnections($conn);
     }
 
     /**
@@ -120,8 +118,22 @@ class MessageHandler implements MessageComponentInterface
      */
     public function onError(ConnectionInterface $conn, \Exception $e): void
     {
-        $this->operatorConnections->del($conn);
-        $this->sessionsConnections->del($conn);
+        $this->closeConnections($conn);
         $conn->close();
+    }
+
+    /**
+     * @param ConnectionInterface $conn
+     * @return void
+     */
+    private function closeConnections(ConnectionInterface $conn): void
+    {
+        if ($this->operatorConnections->del($conn)) {
+            $this->output->writeln("Close operator connection");
+        }
+        $session = $this->sessionsConnections->del($conn);
+        if (false !== $session) {
+            $this->output->writeln("Close session connection $session");
+        }
     }
 }

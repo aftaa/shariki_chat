@@ -51,9 +51,15 @@ trait MessageHandlerTrait
         }
         $message = (object)[
             'command' => 'upd_session',
-            'session' => $sessionName,
-            'last_message' => $this->chatDateManager->format($data['last_message']),
-            'message_count' => $data['message_count'],
+            'session' => [
+                'session' => $sessionName,
+                'name' => $sessionName,
+                'last_message' => $this->chatDateManager->format($data['last_message']),
+                'started' => $this->chatDateManager->format($data['started']),
+                'message_count' => $data['message_count'],
+                'has_new_message' => $data['has_new_message'],
+                'has_new_message1' => $data['has_new_message1'],
+                'hidden' => !$data['has_new_message1'] && 1 == $data['message_count'],]
         ];
         $msg = json_encode($message);
         $this->operatorConnections->send($msg);
@@ -78,9 +84,9 @@ trait MessageHandlerTrait
                 continue;
             }
 
-//            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
-//                continue;
-//            }
+            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
+                continue;
+            }
 
             $msg = (object)[
                 'command' => 'session',
@@ -91,6 +97,7 @@ trait MessageHandlerTrait
                     'started' => $this->chatDateManager->format($session['started']),
                     'message_count' => $session['message_count'],
                     'has_new_message' => $session['has_new_message'],
+                    'hidden' => !$session['has_new_message1'] && 1 == $session['message_count'],
                 ],
             ];
             $msg = json_encode($msg, JSON_FORCE_OBJECT);
@@ -137,9 +144,8 @@ trait MessageHandlerTrait
             $msg = json_encode($answer);
             $this->output->writeln('Sending welcome message');
             $this->sessionsConnections->send($session->getName(), $msg);
-            $this->operatorConnections->send($msg);
-
-            $this->operatorNewSession($session);
+            //$this->operatorConnections->send($msg);
+            //$this->operatorNewSession($session);
         }
     }
 
@@ -198,11 +204,8 @@ trait MessageHandlerTrait
         }
 
         if ($this->chatManager->isNewChat($session)) {
-            if ('localhost' === $_SERVER['SERVER_NAME']) {
-                $emailTo = ['mail@max-after.ru'];
-            } else {
-                $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
-            }
+            $emailTo = ['mail@max-after.ru'];
+//                $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
             $email = (new Email())
                 ->from('info@gelievyeshari24.ru')
                 ->addTo(...$emailTo)

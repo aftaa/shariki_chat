@@ -94,10 +94,17 @@ class SessionRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        echo $sql = '
-            SELECT 
+        $sql = '
+            SELECT s.id AS id, s.name AS `session`, s.session_started AS started,
+                (SELECT TIME_TO_SEC(TIMEDIFF(NOW(), MAX(created))) FROM chat WHERE s.id=session_id) AS timediff,
                 (SELECT created FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) AS last_message,
-                (SELECT COUNT(*) FROM chat WHERE s.id=session_id) AS message_count
+                (SELECT COUNT(*) FROM chat WHERE s.id=session_id) AS message_count,
+                (SELECT NOT is_operator FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
+                    OR 
+                (SELECT "Чат-бот" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
+                    AS has_new_message, 
+                (SELECT "Вы" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
+                    AS has_new_message1 
             FROM session s
             WHERE s.name = "' . $sessionName . '"
         ';
