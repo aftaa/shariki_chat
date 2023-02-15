@@ -74,9 +74,9 @@ trait MessageHandlerTrait
                 continue;
             }
             $format = $this->chatDateManager->format($session['last_message']);
-            if ('-' === $format) {
-                continue;
-            }
+//            if ('-' === $format) {
+//                continue;
+//            }
 
 //            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
 //                continue;
