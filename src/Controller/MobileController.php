@@ -15,4 +15,12 @@ class MobileController extends AbstractController
             'local' =>'localhost' === $_SERVER['SERVER_NAME'],
         ]);
     }
+
+    #[Route('/mobile/new', name: 'app_mobile_new')]
+    public function new(): Response
+    {
+        return $this->render('mobile/new.html.twig', [
+            'local' =>'localhost' === $_SERVER['SERVER_NAME'],
+        ]);
+    }
 }
