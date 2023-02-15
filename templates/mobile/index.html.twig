@@ -287,15 +287,13 @@
             } else {
                 $('#session-' + message.session).addClass('new-message').prependTo('main');
             }
-
-            if (message.push_notification && 'hidden' === document.visibilityState) {
-                //regWorker(message.message);
-            }
         }
 
         function scrollToBottom(session) {
             let chatMessages = document.getElementById("messages-" + session);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         }
 
         $('button').on('click', function () {
