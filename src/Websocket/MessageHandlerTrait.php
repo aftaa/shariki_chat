@@ -106,6 +106,45 @@ trait MessageHandlerTrait
     }
 
     /**
+     * @param ConnectionInterface $connection
+     * @return void
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function operatorGetSessionsAll(ConnectionInterface $connection): void
+    {
+        $sessions = $this->operatorManager->getSessions();
+        $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
+        foreach ($sessions as $session) {
+//            if ($session['timediff'] > 3600 * 24) {
+//                continue;
+//            }
+            $format = $this->chatDateManager->format($session['last_message']);
+//            if ('-' === $format) {
+//                continue;
+//            }
+//
+//            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
+//                continue;
+//            }
+
+            $msg = (object)[
+                'command' => 'session',
+                'session' => (object)[
+                    'name' => $session['session'],
+                    'id' => $session['id'],
+                    'last_message' => $format,
+                    'started' => $this->chatDateManager->format($session['started']),
+                    'message_count' => $session['message_count'],
+                    'has_new_message' => $session['has_new_message'],
+                    'hidden' => !$session['has_new_message1'] && 1 == $session['message_count'],
+                ],
+            ];
+            $msg = json_encode($msg, JSON_FORCE_OBJECT);
+            $connection->send($msg);
+        }
+    }
+
+    /**
      * @param mixed $message
      * @param ConnectionInterface $connection
      * @return void

@@ -16,10 +16,10 @@ class MobileController extends AbstractController
         ]);
     }
 
-    #[Route('/mobile/old', name: 'app_mobile_old')]
-    public function old(): Response
+    #[Route('/mobile/all', name: 'app_mobile_all')]
+    public function all(): Response
     {
-        return $this->render('mobile/index.html.twig', [
+        return $this->render('mobile/all.html.twig', [
             'local' =>'localhost' === $_SERVER['SERVER_NAME'],
         ]);
     }

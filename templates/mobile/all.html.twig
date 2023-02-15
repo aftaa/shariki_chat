@@ -162,7 +162,7 @@
             socket.onopen = function () {
                 setStatus(true);
                 command({command: 'get_work_mode'});
-                command({command: 'get_sessions'});
+                command({command: 'get_sessions_all'});
             }
             socket.onmessage = function (event) {
                 let message = JSON.parse(event.data);

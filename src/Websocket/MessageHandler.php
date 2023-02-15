@@ -67,6 +67,9 @@ class MessageHandler implements MessageComponentInterface
                 case 'get_sessions':
                     $this->operatorGetSessions($connection);
                     break;
+                case 'get_sessions_all':
+                    $this->operatorGetSessionsAll($connection);
+                    break;
                 case 'get_history':
                     $this->getHistory($message, $connection);
                     break;
