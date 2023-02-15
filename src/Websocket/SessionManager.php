@@ -34,8 +34,8 @@ class SessionManager
             if ($connectionManager->del($connection)) {
                 return $session;
             }
-            return false;
         }
+        return false;
     }
 
     /**
