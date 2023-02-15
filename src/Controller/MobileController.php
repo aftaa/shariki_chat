@@ -11,7 +11,7 @@ class MobileController extends AbstractController
     #[Route('/mobile', name: 'app_mobile')]
     public function index(): Response
     {
-        return $this->render('mobile/index.html.twig', [
+        return $this->render('mobile/new.html.twig', [
             'local' =>'localhost' === $_SERVER['SERVER_NAME'],
         ]);
     }
