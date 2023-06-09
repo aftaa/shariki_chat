@@ -65,7 +65,7 @@ class ChatRepository extends ServiceEntityRepository
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
             SELECT COUNT(*) AS chat_count FROM chat
-            WHERE name = 'Вы' AND session_id={$session->getId()}
+            WHERE name = 'Вы' AND session_id='{$session->getId()}'
         ";
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

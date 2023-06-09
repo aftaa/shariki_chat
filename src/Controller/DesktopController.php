@@ -14,7 +14,7 @@ class DesktopController extends AbstractController
     public function index(): Response
     {
         return $this->render('desktop/index.html.twig', [
-            'local' =>'shariki-chat' === $_SERVER['SERVER_NAME'],
+            'local' =>'localhost' === $_SERVER['SERVER_NAME'],
         ]);
     }
 }
