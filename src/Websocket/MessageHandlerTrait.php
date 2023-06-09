@@ -242,16 +242,13 @@ trait MessageHandlerTrait
             $this->pushManager->webPushSend($message->message);
         }
 
-        if (true || $this->chatManager->isNewChat($session)) {
-            $emailTo = ['mail@max-after.ru'];
-            $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
-            $email = (new Email())
-                ->from('info@gelievyeshari24.ru')
-                ->addTo(...$emailTo)
-                ->subject('Чат: ' . $message->message)
-                ->text($message->message);
-            $this->mailer->send($email);
-        }
+        $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
+        $email = (new Email())
+            ->from('info@gelievyeshari24.ru')
+            ->addTo(...$emailTo)
+            ->subject('Чат: ' . $message->message)
+            ->text($message->message);
+        $this->mailer->send($email);
 
         if ('bot' === $this->operatorManager->getWorkMode()) {
             $message = new Message(

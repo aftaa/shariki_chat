@@ -9,6 +9,7 @@ use App\Manager\WebPushManager;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 
 class MessageHandler implements MessageComponentInterface
@@ -102,6 +103,7 @@ class MessageHandler implements MessageComponentInterface
                 . ' on line ' . $exception->getLine()
                 . ' in file ' . $exception->getFile()
             );
+        } catch (TransportExceptionInterface $e) {
         }
     }
 
