@@ -242,7 +242,7 @@ trait MessageHandlerTrait
             $this->pushManager->webPushSend($message->message);
         }
 
-        if ($this->chatManager->isNewChat($session)) {
+        if (true || $this->chatManager->isNewChat($session)) {
             $emailTo = ['mail@max-after.ru'];
             $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
             $email = (new Email())
