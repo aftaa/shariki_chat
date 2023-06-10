@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="shariki_chat@127.0.0.1" uuid="d769d62d-1a6e-42d7-848f-4d8cda97b2ad">
+    <data-source source="LOCAL" name="shariki_chat@data-files.ru" uuid="d769d62d-1a6e-42d7-848f-4d8cda97b2ad">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://127.0.0.1:3306/shariki_chat</jdbc-url>
+      <jdbc-url>jdbc:mysql://data-files.ru:3306/shariki_chat</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

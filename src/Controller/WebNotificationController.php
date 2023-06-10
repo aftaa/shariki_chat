@@ -124,7 +124,7 @@ class WebNotificationController extends AbstractController
 
 // (C) NEW WEB PUSH OBJECT - CHANGE TO YOUR OWN!
         $push = new WebPush(["VAPID" => [
-            "subject" => "after@ya.ru",
+            "subject" => "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile",
             'publicKey' => file_get_contents(__DIR__ . '/../../etc/keys/public_key.txt'),
             'privateKey' => file_get_contents(__DIR__ . '/../../etc/keys/private_key.txt'),
         ]]);
