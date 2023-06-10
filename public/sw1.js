@@ -11,7 +11,7 @@ self.addEventListener("push", evt => {
     self.registration.showNotification(data.title, {
         body: data.body,
         data: {
-            url: 'https://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile'
+            click_action: 'https://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile'
         }
     });
 });
