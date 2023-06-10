@@ -130,12 +130,13 @@ class WebNotificationController extends AbstractController
         ]]);
 
 // (D) SEND TEST PUSH NOTIFICATION
+
         $result = $push->sendOneNotification($sub, json_encode([
             "title" => "Чат",
             "body" => $message,
-            "click_action" => "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile",
-//            "icon" => "i-loud.png",
-//            "image" => "i-cover.png"
+            "data" => [
+                "click_action" => "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile",
+            ],
         ]));
         $endpoint = $result->getRequest()->getUri()->__toString();
 
