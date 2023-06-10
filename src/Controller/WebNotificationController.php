@@ -137,6 +137,7 @@ class WebNotificationController extends AbstractController
             "data" => [
                 "click_action" => "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile",
             ],
+            "click_action" => "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile",
         ]));
         $endpoint = $result->getRequest()->getUri()->__toString();
 

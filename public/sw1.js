@@ -12,6 +12,7 @@ self.addEventListener("push", evt => {
         body: data.body,
         data: {
             url: 'https://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile'
-        }
+        },
+        click_action: "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile"
     });
 });
