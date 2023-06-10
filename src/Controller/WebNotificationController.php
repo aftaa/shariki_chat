@@ -124,15 +124,16 @@ class WebNotificationController extends AbstractController
 
 // (C) NEW WEB PUSH OBJECT - CHANGE TO YOUR OWN!
         $push = new WebPush(["VAPID" => [
-            "subject" => "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile",
+            "subject" => "after@ya.ru",
             'publicKey' => file_get_contents(__DIR__ . '/../../etc/keys/public_key.txt'),
             'privateKey' => file_get_contents(__DIR__ . '/../../etc/keys/private_key.txt'),
         ]]);
 
 // (D) SEND TEST PUSH NOTIFICATION
         $result = $push->sendOneNotification($sub, json_encode([
-            "title" => "Шарики-чат",
+            "title" => "Чат",
             "body" => $message,
+            "click_action" => "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile",
 //            "icon" => "i-loud.png",
 //            "image" => "i-cover.png"
         ]));
