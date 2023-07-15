@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\PushSub;
 use App\Repository\PushSubRepository;
+use ErrorException;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\VAPID;
 use Minishlink\WebPush\WebPush;
@@ -28,8 +29,8 @@ class WebNotificationController extends AbstractController
     }
 
     /**
-     * @return void
-     * @throws \ErrorException
+     * @return Response
+     * @throws ErrorException
      */
     #[Route('/send-push-notification', name: 'app_webnotification_sendpushnotification')]
     public function sendPushNotification(): Response
@@ -106,6 +107,9 @@ class WebNotificationController extends AbstractController
         return new Response('');
     }
 
+    /**
+     * @throws ErrorException
+     */
     #[Route('/vapid', name: 'app_webnotification_createkeys')]
     public function createKeys(): Response
     {
@@ -115,7 +119,7 @@ class WebNotificationController extends AbstractController
 
     /**
      * @return void
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     public function addToDb(): void
     {

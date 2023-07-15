@@ -1,0 +1,94 @@
+body, input {
+    font: 15px/20px Arial, sans-serif;
+}
+
+#status {
+    float: left;
+    width: 10px;
+    height: 10px;
+    display: block;
+    background: red;
+    margin-right: 10px;
+    margin-top: 7px;
+    border-radius: 10px;
+}
+
+#status.connected {
+    background: lightgreen;
+}
+
+#work-mode {
+    display: none;
+    float: right;
+}
+
+.session {
+    border: 1px solid gray;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    background: #eee;
+}
+
+.session.hidden {
+    display: none;
+}
+
+.archive {
+    float: right;
+    cursor: pointer;
+    display: none;
+}
+
+.new-message {
+    background: purple;
+    color: #fff;
+}
+
+.messages {
+    border: 1px solid gray;
+    border-radius: 10px;
+    padding: 10px;
+    overflow-y: scroll;
+    height: 300px;
+    background: #fff;
+}
+
+.message {
+    clear: both;
+    margin: 5px;
+    float: left;
+    max-width: 90%;
+}
+
+.operator {
+    float: right;
+}
+
+.text {
+    padding: 10px;
+    background: #eee;
+    border-radius: 10px;
+}
+
+.operator .text {
+    background: #22ceb6;
+    color: #fff;
+}
+
+.datetime {
+    color: gray;
+    font-size: 12px;
+}
+
+.form {
+    margin: 5px 0;
+}
+
+header {
+    overflow: hidden;
+}
+
+footer {
+}
