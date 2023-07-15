@@ -21,7 +21,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
-    name: 'app:websocket-server',
+    name: 'ws',
 )]
 class WebsocketServerCommand extends Command
 {

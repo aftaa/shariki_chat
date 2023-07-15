@@ -57,12 +57,12 @@
                 socket.send(JSON.stringify(command));
 
                 command = {
-                    command: 'get_work_mode'
+                    command: 'Operator_Request_GetWorkMode'
                 };
                 socket.send(JSON.stringify(command));
 
                 command = {
-                    command: 'load_welcome_message'
+                    command: 'Operator_Request_GetWelcomeMessage'
                 };
                 socket.send(JSON.stringify(command));
 
@@ -79,8 +79,8 @@
                         addSession(message.session);
                         queryMessages(message.session.name);
                         break;
-                    case 'work_mode':
-                        let work_mode = message.work_mode;
+                    case 'Operator_Response_GetWorkMode':
+                        let work_mode = message.content.work_mode;
                         let select = document.getElementById('work-mode-select');
                         switch (work_mode) {
                             case 'bot':
@@ -93,8 +93,8 @@
                     case 'new_message':
                         addMessage(message);
                         break;
-                    case 'welcome_message':
-                        $('#welcome-message input').val(message.message);
+                    case 'Operator_Response_GetWelcomeMessage':
+                        $('#welcome-message input').val(message.content.welcome_message);
                         break;
                     case 'timeout_message':
                         $('#timeout-message input').val(message.message);
