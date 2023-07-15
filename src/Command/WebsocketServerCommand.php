@@ -25,13 +25,10 @@ use Symfony\Component\Mailer\MailerInterface;
 )]
 class WebsocketServerCommand extends Command
 {
-    const PORT = 3001;
+    public final const PORT = 3001;
 
     public function __construct(
-        private readonly ChatManager     $chatManager,
-        private readonly OperatorManager $operatorManager,
-        private readonly MailerInterface $mailer,
-        private readonly WebPushManager  $pushManager,
+        private readonly MessageHandler $messageHandler
     )
     {
         parent::__construct();
@@ -42,19 +39,12 @@ class WebsocketServerCommand extends Command
         error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
         ini_set('display_errors', '1');
         date_default_timezone_set('Europe/Moscow');
-
         $output->writeln("Starting server on port " . self::PORT);
-        $output->writeln((new \DateTime())->format('H:i'));
+        $output->writeln((new \DateTime())->format('H:i:s'));
         $server = IoServer::factory(
             new HttpServer(
                 new WsServer(
-                    new MessageHandler(
-                        $this->chatManager,
-                        $this->operatorManager,
-                        $output,
-                        $this->mailer,
-                        $this->pushManager,
-                    )
+                    $this->messageHandler->setOutput($output),
                 )
             ),
             self::PORT,

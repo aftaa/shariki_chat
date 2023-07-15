@@ -15,6 +15,7 @@ use Symfony\Component\Mailer\MailerInterface;
 class MessageHandler implements MessageComponentInterface
 {
     use MessageHandlerTrait;
+    private OutputInterface $output;
 
     /**
      * @var ConnectionInterface[]
@@ -24,7 +25,6 @@ class MessageHandler implements MessageComponentInterface
     public function __construct(
         private readonly ChatManager       $chatManager,
         private readonly OperatorManager   $operatorManager,
-        private readonly OutputInterface   $output,
         private readonly MailerInterface   $mailer,
         private readonly WebPushManager    $pushManager,
         private readonly ConnectionManager $operatorConnections = new ConnectionManager(),
@@ -34,7 +34,17 @@ class MessageHandler implements MessageComponentInterface
     {
     }
 
-    public function onOpen(ConnectionInterface $conn)
+    /**
+     * @param OutputInterface $output
+     * @return $this
+     */
+    public function setOutput(OutputInterface $output): static
+    {
+        $this->output = $output;
+        return $this;
+    }
+
+    public function onOpen(ConnectionInterface $conn): void
     {
         $queryString = $conn->httpRequest->getUri()->getQuery();
         parse_str($queryString, $params);
