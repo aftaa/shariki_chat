@@ -5,13 +5,13 @@ namespace App\Handler\Operator;
 use App\Handler\OperatorHandler;
 use App\Handler\Message;
 
-class GetWorkMode extends OperatorHandler
+class GetWelcomeMessage extends OperatorHandler
 {
     public function handle(Message $message): object
     {
-        $workMode = $this->workModeService->get();
+        $welcomeMessage = $this->messageService->get('welcome');
         return (object)[
-            'work_mode' => $workMode,
+            'welcome_message' => $welcomeMessage,
         ];
     }
 }

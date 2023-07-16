@@ -8,12 +8,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DesktopController extends AbstractController
+class SettingsController extends AbstractController
 {
-    #[Route('/desktop', name: 'app_desktop')]
+    #[Route('/settings', name: 'app_settings')]
     public function index(): Response
     {
-        return $this->render('desktop/index.html.twig', [
+        return $this->render('settings/index.html.twig', [
             'local' =>'localhost' === $_SERVER['SERVER_NAME'],
         ]);
     }

@@ -4,14 +4,21 @@ namespace App\Handler;
 
 use Ratchet\ConnectionInterface;
 
-readonly class MessageDto
+class Message
 {
+    /**
+     * @param string $command
+     * @param object $content
+     */
     public function __construct(
         public string $command,
         public object $content,
     )
     {
         unset($this->content->command);
+        if (isset($this->content->content)) {
+            $this->content = $this->content->content;
+        }
     }
 
     /**

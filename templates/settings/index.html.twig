@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Настройки{% endblock %}
+
+{% block body %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/desktop.css') }}?t={{ 'now'|date('U') }}">
+
+    <header>
+        <div id="status">Не подключено</div>
+        <div id="work-mode">
+            <label for="work-mode-select">
+                Режим работы:
+            </label>
+            <select id="work-mode-select">
+                <option value="bot">Bot</option>
+                <option value="operator">Operator</option>
+            </select>
+        </div>
+        <div id="welcome-message">
+            <label>
+                Бот-приветствие в чате:
+                <input type="text">
+                <button>Сохранить</button>
+            </label>
+        </div>
+        <div id="timeout-message">
+            <label>
+                Бот-сообщение в нерабочее время:
+                <input type="text">
+                <button>Сохранить</button>
+            </label>
+        </div>
+    </header>
+
+    <aside></aside>
+
+    <main></main>
+
+    <script>
+        let socket;
+    </script>
+
+    {% if local %}
+        <script>
+            let socket_addr = 'ws://localhost:3001?operator=1';
+        </script>
+    {% else %}
+        <script>
+            let socket_addr = 'wss://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai:3002?operator=1';
+        </script>
+    {% endif %}
+
+    <script type="text/javascript" src="{{ asset('js/desktop.js') }}?t={{ 'now'|date('U') }}"></script>
+{% endblock %}

@@ -2,13 +2,14 @@
 
 namespace App\Websocket;
 
+use App\Handler\OperatorHandler;
 use App\Manager\ChatDateManager;
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
 use App\Manager\WebPushManager;
-use App\Handler\MessageDto;
-use App\Handler\HandlerFactory;
-use App\Handler\HandlerFactoryException;
+use App\Handler\Message;
+use App\Handler\OperatorFactory;
+use App\Handler\FactoryException;
 use App\Handler\HandlerResponse;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -32,8 +33,8 @@ class MessageHandler implements MessageComponentInterface
         private OperatorManager   $operatorManager,
         private MailerInterface   $mailer,
         private WebPushManager    $pushManager,
-        private HandlerFactory    $messageHandlerFactory,
-        private HandlerResponse   $messageHandlerResponse,
+        private OperatorHandler   $operatorHandler,
+        private HandlerResponse   $handlerResponse,
         private ConnectionManager $operatorConnections = new ConnectionManager(),
         private SessionManager    $sessionsConnections = new SessionManager(),
         private ChatDateManager   $chatDateManager = new ChatDateManager(),
@@ -68,27 +69,27 @@ class MessageHandler implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg): void
     {
         try {
-            $decodedMessage = json_decode($msg);
-            $requestMessage = new MessageDto($decodedMessage->command, $decodedMessage);
-
+            print_r($msg);
+            $message = json_decode($msg);
+            $message = new Message($message->command, $message);
             $this->output->writeln('');
-            $this->output->writeln("[ {$requestMessage->getCommand()} ]");
+            $this->output->writeln("[ {$message->getCommand()} ]");
+            print_r($message);
 
             try {
-                $responseMessage = $this->messageHandlerFactory->create($requestMessage->getCommand())->handle($requestMessage);
+                $messageContent = $this->operatorHandler->new($message->getCommand())->handle($message);
 
-                $this->messageHandlerResponse->send($from, $responseMessage);
+                $this->handlerResponse->send($from, new Message(
+                    $message->getCommand(),
+                    $messageContent,
+                ));
 
-                $this->output->writeln("[ {$responseMessage->getCommand()} ]");
-            } catch (HandlerFactoryException $messageHandlerFactoryException) {
+            } catch (FactoryException $messageHandlerFactoryException) {
                 $this->output->writeln($messageHandlerFactoryException->getMessage());
 
-                switch ($requestMessage->getCommand()) {
-//                    case 'get_work_mode':
-//                        $this->getWorkMode($from);
-//                        break;
+                switch ($message->getCommand()) {
                     case 'set_work_mode':
-                        $this->setWorkMode($requestMessage, $from);
+                        $this->setWorkMode($message, $from);
                         break;
                     case 'add_op_message':
                         $this->operatorAddMessage($from, $msg);
@@ -100,25 +101,19 @@ class MessageHandler implements MessageComponentInterface
                         $this->operatorGetSessionsAll($from);
                         break;
                     case 'get_history':
-                        $this->getHistory($requestMessage, $from);
+                        $this->getHistory($message, $from);
                         break;
                     case 'get_op_history':
-                        $this->operatorGetHistory($requestMessage, $from);
+                        $this->operatorGetHistory($message, $from);
                         break;
                     case 'add_message':
-                        $this->addMessage($requestMessage, $from, $msg);
+                        $this->addMessage($message, $from, $msg);
                         break;
-//                    case 'load_welcome_message':
-//                        $this->loadWelcomeMessage(); // returns command 'welcome_message'
-//                        break;
-//                    case 'load_timeout_message':
-//                        $this->loadTimeoutMessage(); // returns command 'timeout_message'
-//                        break;
                     case 'save_welcome_message':
-                        $this->saveWelcomeMessage($requestMessage); // returns command 'welcome_message'
+                        $this->saveWelcomeMessage($message); // returns command 'welcome_message'
                         break;
                     case 'save_timeout_message':
-                        $this->saveTimeoutMessage($requestMessage); // returns command 'timeout_message'
+                        $this->saveTimeoutMessage($message); // returns command 'timeout_message'
                         break;
                     case 'ping':
                         $this->output->writeln('[ ping pong ]');
