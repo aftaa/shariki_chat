@@ -1,10 +1,10 @@
 <?php
 
-namespace App\MessageHandler;
+namespace App\Handler;
 
 use Ratchet\ConnectionInterface;
 
-readonly class MessageHandlerDto
+readonly class MessageDto
 {
     public function __construct(
         public string $command,

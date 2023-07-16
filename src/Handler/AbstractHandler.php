@@ -1,12 +1,12 @@
 <?php
 
-namespace App\MessageHandler;
+namespace App\Handler;
 
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
 use App\Service\WorkModeService;
 
-abstract class MessageHandlerAbstract
+abstract class AbstractHandler
 {
     public function __construct(
         protected OperatorManager $operatorManager,
@@ -16,5 +16,5 @@ abstract class MessageHandlerAbstract
     {
     }
 
-    abstract public function handle(MessageHandlerDto $message): MessageHandlerDto;
+    abstract public function handle(MessageDto $message): MessageDto;
 }

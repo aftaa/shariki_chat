@@ -50,40 +50,27 @@
         function connect() {
             socket = new WebSocket(socket_addr);
             socket.addEventListener("open", function () {
-
-
-
                 $('#status').html("Подключено");
                 let command = {
-                    command: 'get_sessions'
+                    command: 'get_work_mode'
                 };
                 socket.send(JSON.stringify(command));
 
                 command = {
-                    command: 'Operator_Request_GetWorkMode'
+                    command: 'get_welcome_message'
                 };
                 socket.send(JSON.stringify(command));
 
                 command = {
-                    command: 'Operator_Request_GetWelcomeMessage'
-                };
-                socket.send(JSON.stringify(command));
-
-                command = {
-                    command: 'Operator_Request_GetTimeoutMessage'
+                    command: 'get_timeout_message'
                 };
                 socket.send(JSON.stringify(command));
             });
 
             socket.addEventListener("message", function (e) {
                 const message = JSON.parse(e.data);
-                console.log(message);
                 switch (message.command) {
-                    case 'session':
-                        addSession(message.session);
-                        queryMessages(message.session.name);
-                        break;
-                    case 'Operator_Response_GetWorkMode':
+                    case 'get_work_mode':
                         let work_mode = message.content.work_mode;
                         let select = document.getElementById('work-mode-select');
                         switch (work_mode) {
@@ -94,127 +81,26 @@
                                 select.selectedIndex = 1;
                         }
                         break;
-                    case 'new_message':
-                        addMessage(message);
-                        break;
-                    case 'Operator_Response_GetWelcomeMessage':
+                    case 'get_welcome_message':
                         $('#welcome-message input').val(message.content.welcome_message);
                         break;
-                    case 'Operator_Response_GetTimeoutMessage':
+                    case 'get_timeout_message':
                         $('#timeout-message input').val(message.content.timeout_message);
                         break;
                 }
             });
 
             socket.addEventListener("close", function () {
-                $('#status').html("DISCONNECTED");
-                $('aside,main').html('');
+                $('#status').html("Не подключено");
             });
         }
 
         connect();
 
-        function scrollToBottom(session) {
-            let chatMessages = document.getElementById("chat-" + session);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-
-        function queryMessages(session) {
-            const command = {
-                command: 'get_op_history',
-                session: session
-            };
-            socket.send(JSON.stringify(command));
-        }
-
-
-        function addMessage(message) {
-            let $box = createMessageBox(message.session);
-            let classes = "message";
-            if (message.isOperator) {
-                classes += " operator";
-            }
-            $box.append('<div class="' + classes + '">' + message.message + '</div>');
-            scrollToBottom(message.session);
-        }
-
-        function createMessageBox(session) {
-            if (!$('#chat-' + session).length) {
-
-                $('main').append('<div class="messages" id="messages-' + session + '"></div>');
-                $('#messages-' + session).append('<div class="chat" id="chat-' + session + '"></div>');
-                let form = '<div class="chat-form" data-session=" + session + " id="form-' + session + '">'
-                    + '    <label>'
-                    + '        <input type="text" placeholder="Напишите и нажмите Enter">'
-                    + '    </label>'
-                    + '    <button>&gt;</button>'
-                    + '</div>';
-                $('#messages-' + session).append(form);
-                formEventListener(session);
-            }
-            return $('#chat-' + session);
-        }
-
-        function addSession(session) {
-            let html = '<div class="session" id="session-' + session.name + '">'
-                + '</span><br><a href=""'
-                + ' data-chat="#messages-' + session.name + '" data-session="'
-                + session.name + '">Чат ' + session.id + '</a>'
-                + 'Начат: ' + session.started + '<br>'
-                + 'Посл. сообщ.: ' + session.last_message + '<br>'
-                + 'Всего сообщ.: ' + session.message_count + '<br>'
-                + '</div>';
-            $('aside').append(html);
-            anchorEventListener(session);
-        }
-
-        function anchorEventListener(session) {
-            $('#session-' + session.name + '  a').on('click', function (event) {
-                event.preventDefault();
-                let target = this.dataset.chat;
-                let session = this.dataset.session;
-                $('#chat-' + session).html('');
-                queryMessages(session);
-                $('.messages').hide();
-                $(target).show();
-                scrollToBottom(session);
-            })
-        }
-
-        function formEventListener(session) {
-            $('#form-' + session + ' input').on('keypress', function (event) {
-                if (13 === event.keyCode && $.trim(this.value)) {
-                    let message = this.value;
-                    this.value = '';
-                    sendMessage(message, session);
-                }
-            });
-            $('#form-' + session + ' button').on('click', function (event) {
-                let message = $('#form-' + session + ' input').val();
-                if ($.trim(message)) {
-                    $('#form-' + session + ' input').val('');
-                    sendMessage(message, session);
-                }
-            });
-        }
-
-        function sendMessage(text, session) {
-            const message = {
-                command: 'add_op_message',
-                session: session,
-                message: text,
-                name: 'Оператор',
-                isOperator: true
-            };
-            socket.send(JSON.stringify(message));
-            scrollToBottom(session);
-        }
-
         setInterval(function () {
             let status = $('#status').html();
-            if ('DISCONNECTED' === status) {
-                console.log('Trying to connect to server', socket_addr);
+            if ('Не подключено' === status) {
+                console.log('Подключаемся к серверу', socket_addr);
                 connect();
             }
         }, 10000);
@@ -222,28 +108,34 @@
         $('#work-mode-select').on('change', function (event) {
             let work_mode = $('option:selected', this).val();
             let message = {
-                command: 'set_work_mode',
-                work_mode: work_mode
+                command: 'Operator_Request_SetWorkMode',
+                content: {
+                    work_mode: work_mode
+                }
             };
             message = JSON.stringify(message);
             socket.send(message);
         })
 
         $('#welcome-message button').on('click', function () {
-            let message = $('#welcome-message input').val();
-            message = {
-                command: 'save_welcome_message',
-                message: message
+            let welcome_message = $('#welcome-message input').val();
+            let message = {
+                command: 'Operator_Request_SetWelcomeMessage',
+                content: {
+                    welcome_message: welcome_message
+                }
             };
             message = JSON.stringify(message);
             socket.send(message);
         })
 
         $('#timeout-message button').on('click', function () {
-            let message = $('#timeout-message input').val();
-            message = {
-                command: 'save_timeout_message',
-                message: message
+            let timeout_message = $('#timeout-message input').val();
+            let message = {
+                command: 'Operator_Request_SetTimeoutMessage',
+                content: {
+                    timeout_message: timeout_message
+                }
             };
             message = JSON.stringify(message);
             socket.send(message);

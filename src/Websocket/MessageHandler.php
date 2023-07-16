@@ -6,9 +6,10 @@ use App\Manager\ChatDateManager;
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
 use App\Manager\WebPushManager;
-use App\MessageHandler\MessageHandlerDto;
-use App\MessageHandler\MessageHandlerFactory;
-use App\MessageHandler\MessageHandlerFactoryException;
+use App\Handler\MessageDto;
+use App\Handler\HandlerFactory;
+use App\Handler\HandlerFactoryException;
+use App\Handler\HandlerResponse;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,14 +28,15 @@ class MessageHandler implements MessageComponentInterface
     private array $sessions = [];
 
     public function __construct(
-        private readonly ChatManager           $chatManager,
-        private readonly OperatorManager       $operatorManager,
-        private readonly MailerInterface       $mailer,
-        private readonly WebPushManager        $pushManager,
-        private readonly MessageHandlerFactory $messageHandlerFactory,
-        private readonly ConnectionManager     $operatorConnections = new ConnectionManager(),
-        private readonly SessionManager        $sessionsConnections = new SessionManager(),
-        private readonly ChatDateManager       $chatDateManager = new ChatDateManager(),
+        private ChatManager       $chatManager,
+        private OperatorManager   $operatorManager,
+        private MailerInterface   $mailer,
+        private WebPushManager    $pushManager,
+        private HandlerFactory    $messageHandlerFactory,
+        private HandlerResponse   $messageHandlerResponse,
+        private ConnectionManager $operatorConnections = new ConnectionManager(),
+        private SessionManager    $sessionsConnections = new SessionManager(),
+        private ChatDateManager   $chatDateManager = new ChatDateManager(),
     )
     {
     }
@@ -67,7 +69,7 @@ class MessageHandler implements MessageComponentInterface
     {
         try {
             $decodedMessage = json_decode($msg);
-            $requestMessage = new MessageHandlerDto($decodedMessage->command, $decodedMessage);
+            $requestMessage = new MessageDto($decodedMessage->command, $decodedMessage);
 
             $this->output->writeln('');
             $this->output->writeln("[ {$requestMessage->getCommand()} ]");
@@ -75,10 +77,10 @@ class MessageHandler implements MessageComponentInterface
             try {
                 $responseMessage = $this->messageHandlerFactory->create($requestMessage->getCommand())->handle($requestMessage);
 
-                $this->messageHandlerFactory->create($responseMessage->getCommand())->send($from, $responseMessage);
+                $this->messageHandlerResponse->send($from, $responseMessage);
 
                 $this->output->writeln("[ {$responseMessage->getCommand()} ]");
-            } catch (MessageHandlerFactoryException $messageHandlerFactoryException) {
+            } catch (HandlerFactoryException $messageHandlerFactoryException) {
                 $this->output->writeln($messageHandlerFactoryException->getMessage());
 
                 switch ($requestMessage->getCommand()) {

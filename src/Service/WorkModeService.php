@@ -17,7 +17,7 @@ class WorkModeService
 
     public function __construct(
         private readonly WorkModeRepository $workModeRepository,
-        private bool                        $manual,
+        private bool                        $manual = false,
     )
     {
         $this->manual = !empty($_ENV['APP_MANUAL']);

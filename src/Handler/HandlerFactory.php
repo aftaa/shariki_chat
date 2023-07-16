@@ -1,12 +1,12 @@
 <?php
 
-namespace App\MessageHandler;
+namespace App\Handler;
 
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
 use App\Service\WorkModeService;
 
-readonly class MessageHandlerFactory
+readonly class HandlerFactory
 {
     public function __construct(
         private OperatorManager $operatorManager,
@@ -18,15 +18,15 @@ readonly class MessageHandlerFactory
 
     /**
      * @param string $className
-     * @return MessageHandlerAbstract|MessageHandlerResponse
-     * @throws MessageHandlerFactoryException
+     * @return AbstractHandler|HandlerResponse
+     * @throws HandlerFactoryException
      */
-    public function create(string $className): MessageHandlerAbstract|MessageHandlerResponse
+    public function create(string $className): AbstractHandler|HandlerResponse
     {
         $className = str_replace('_', '\\', $className);
-        $className = 'App\\MessageHandler\\' . $className;
+        $className = 'App\\MessageHandler\\Operator\\' . $className;
         if (!class_exists($className)) {
-            throw new MessageHandlerFactoryException("Class $className not exists");
+            throw new HandlerFactoryException("Class $className not exists");
         }
         return new $className(
             $this->operatorManager,
