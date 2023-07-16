@@ -7,11 +7,11 @@ use Ratchet\ConnectionInterface;
 readonly class MessageHandlerDto
 {
     public function __construct(
-        private string $command,
-        private object $content,
-        private ConnectionInterface $connection,
+        public string $command,
+        public object $content,
     )
     {
+        unset($this->content->command);
     }
 
     /**
@@ -28,13 +28,5 @@ readonly class MessageHandlerDto
     public function getContent(): object
     {
         return $this->content;
-    }
-
-    /**
-     * @return ConnectionInterface
-     */
-    public function getConnection(): ConnectionInterface
-    {
-        return $this->connection;
     }
 }

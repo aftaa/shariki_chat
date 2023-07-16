@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/desktop.css') }}?t={{ 'now'|date('U') }}">
 
     <header>
-        <div id="status">DISCONNECTED</div>
+        <div id="status">Не подключено</div>
         <div id="work-mode">
             <label for="work-mode-select">
                 Режим работы:
@@ -50,7 +50,10 @@
         function connect() {
             socket = new WebSocket(socket_addr);
             socket.addEventListener("open", function () {
-                $('#status').html("CONNECTED");
+
+
+
+                $('#status').html("Подключено");
                 let command = {
                     command: 'get_sessions'
                 };
@@ -67,13 +70,14 @@
                 socket.send(JSON.stringify(command));
 
                 command = {
-                    command: 'load_timeout_message'
+                    command: 'Operator_Request_GetTimeoutMessage'
                 };
                 socket.send(JSON.stringify(command));
             });
 
             socket.addEventListener("message", function (e) {
                 const message = JSON.parse(e.data);
+                console.log(message);
                 switch (message.command) {
                     case 'session':
                         addSession(message.session);
@@ -96,8 +100,8 @@
                     case 'Operator_Response_GetWelcomeMessage':
                         $('#welcome-message input').val(message.content.welcome_message);
                         break;
-                    case 'timeout_message':
-                        $('#timeout-message input').val(message.message);
+                    case 'Operator_Response_GetTimeoutMessage':
+                        $('#timeout-message input').val(message.content.timeout_message);
                         break;
                 }
             });

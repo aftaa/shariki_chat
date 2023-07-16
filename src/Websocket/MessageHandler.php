@@ -54,11 +54,11 @@ class MessageHandler implements MessageComponentInterface
         $queryString = $conn->httpRequest->getUri()->getQuery();
         parse_str($queryString, $params);
         if (array_key_exists('operator', $params)) {
-            $this->output->writeln('New operator connection');
+            $this->output->writeln('[ OPERATOR ]');
             $this->operatorConnections->add($conn);
         }
         if (array_key_exists('session', $params)) {
-            $this->output->writeln('New session connection ' . $params['session']);
+            $this->output->writeln("[ SESSION $params[session] ]");
             $this->sessionsConnections->add($params['session'], $conn);
         }
     }
@@ -67,15 +67,20 @@ class MessageHandler implements MessageComponentInterface
     {
         try {
             $decodedMessage = json_decode($msg);
-            $requestMessage = new MessageHandlerDto($decodedMessage->command, $decodedMessage, $from);
+            $requestMessage = new MessageHandlerDto($decodedMessage->command, $decodedMessage);
 
             $this->output->writeln('');
             $this->output->writeln("[ {$requestMessage->getCommand()} ]");
 
             try {
                 $responseMessage = $this->messageHandlerFactory->create($requestMessage->getCommand())->handle($requestMessage);
-                $this->messageHandlerFactory->create($responseMessage->getCommand())->sendResponse($responseMessage);
-            } catch (MessageHandlerFactoryException) {
+
+                $this->messageHandlerFactory->create($responseMessage->getCommand())->send($from, $responseMessage);
+
+                $this->output->writeln("[ {$responseMessage->getCommand()} ]");
+            } catch (MessageHandlerFactoryException $messageHandlerFactoryException) {
+                $this->output->writeln($messageHandlerFactoryException->getMessage());
+
                 switch ($requestMessage->getCommand()) {
 //                    case 'get_work_mode':
 //                        $this->getWorkMode($from);
@@ -104,9 +109,9 @@ class MessageHandler implements MessageComponentInterface
 //                    case 'load_welcome_message':
 //                        $this->loadWelcomeMessage(); // returns command 'welcome_message'
 //                        break;
-                    case 'load_timeout_message':
-                        $this->loadTimeoutMessage(); // returns command 'timeout_message'
-                        break;
+//                    case 'load_timeout_message':
+//                        $this->loadTimeoutMessage(); // returns command 'timeout_message'
+//                        break;
                     case 'save_welcome_message':
                         $this->saveWelcomeMessage($requestMessage); // returns command 'welcome_message'
                         break;

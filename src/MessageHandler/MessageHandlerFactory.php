@@ -4,12 +4,14 @@ namespace App\MessageHandler;
 
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
+use App\Service\WorkModeService;
 
 readonly class MessageHandlerFactory
 {
     public function __construct(
         private OperatorManager $operatorManager,
         private ChatManager $chatManager,
+        private WorkModeService $workModeService,
     )
     {
     }
@@ -29,6 +31,7 @@ readonly class MessageHandlerFactory
         return new $className(
             $this->operatorManager,
             $this->chatManager,
+            $this->workModeService,
         );
     }
 }

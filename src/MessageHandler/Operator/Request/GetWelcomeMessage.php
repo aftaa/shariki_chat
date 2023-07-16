@@ -12,6 +12,6 @@ class GetWelcomeMessage extends MessageHandlerAbstract
         $welcomeMessage = $this->chatManager->botWelcomeMessage();
         return new MessageHandlerDto('Operator_Response_GetWelcomeMessage', (object)[
             'welcome_message' => $welcomeMessage,
-        ], $message->getConnection());
+        ]);
     }
 }
