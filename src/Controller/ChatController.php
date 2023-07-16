@@ -7,20 +7,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class MobileController extends AbstractController
+class ChatController extends AbstractController
 {
-    #[Route('/mobile', name: 'app_mobile')]
-    public function index(Request $request): Response
+    #[Route('/chat', name: 'app_chat')]
+    public function chat(Request $request): Response
     {
-        return $this->render('mobile/new.html.twig', [
+        return $this->render('chat/index.html.twig', [
             'local' => 'localhost' == $request->server->get('SERVER_NAME'),
         ]);
     }
 
-    #[Route('/mobile/all', name: 'app_mobile_all')]
-    public function all(Request $request): Response
+    #[Route('/archive', name: 'app_archive')]
+    public function archive(Request $request): Response
     {
-        return $this->render('mobile/all.html.twig', [
+        return $this->render('chat/archive.html.twig', [
             'local' => 'localhost' == $request->server->get('SERVER_NAME'),
         ]);
     }

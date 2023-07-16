@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Handler;
+namespace App\Websocket;
 
+use App\Message;
 use Ratchet\ConnectionInterface;
 
-final class HandlerResponse
+final class ConnectionResponse
 {
     public function send(ConnectionInterface $connection, Message $message): void
     {

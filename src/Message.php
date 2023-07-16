@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Handler;
-
-use Ratchet\ConnectionInterface;
+namespace App;
 
 class Message
 {
@@ -16,6 +14,7 @@ class Message
     )
     {
         unset($this->content->command);
+        // TODO fix bug
         if (isset($this->content->content)) {
             $this->content = $this->content->content;
         }

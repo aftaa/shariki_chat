@@ -2,15 +2,15 @@
 
 namespace App\Websocket;
 
+use App\Handler\FactoryException;
+use App\Handler\OperatorFactory;
 use App\Handler\OperatorHandler;
 use App\Manager\ChatDateManager;
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
 use App\Manager\WebPushManager;
-use App\Handler\Message;
-use App\Handler\OperatorFactory;
-use App\Handler\FactoryException;
-use App\Handler\HandlerResponse;
+use App\Message;
+use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,15 +29,15 @@ class MessageHandler implements MessageComponentInterface
     private array $sessions = [];
 
     public function __construct(
-        private ChatManager       $chatManager,
-        private OperatorManager   $operatorManager,
-        private MailerInterface   $mailer,
-        private WebPushManager    $pushManager,
-        private OperatorHandler   $operatorHandler,
-        private HandlerResponse   $handlerResponse,
-        private ConnectionManager $operatorConnections = new ConnectionManager(),
-        private SessionManager    $sessionsConnections = new SessionManager(),
-        private ChatDateManager   $chatDateManager = new ChatDateManager(),
+        private ChatManager        $chatManager,
+        private OperatorManager    $operatorManager,
+        private MailerInterface    $mailer,
+        private WebPushManager     $pushManager,
+        private OperatorHandler    $operatorHandler,
+        private ConnectionResponse $handlerResponse,
+        private ConnectionManager  $operatorConnections = new ConnectionManager(),
+        private SessionManager     $sessionsConnections = new SessionManager(),
+        private ChatDateManager    $chatDateManager = new ChatDateManager(),
     )
     {
     }
@@ -69,12 +69,10 @@ class MessageHandler implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg): void
     {
         try {
-            print_r($msg);
             $message = json_decode($msg);
             $message = new Message($message->command, $message);
             $this->output->writeln('');
             $this->output->writeln("[ {$message->getCommand()} ]");
-            print_r($message);
 
             try {
                 $messageContent = $this->operatorHandler->new($message->getCommand())->handle($message);
@@ -88,9 +86,6 @@ class MessageHandler implements MessageComponentInterface
                 $this->output->writeln($messageHandlerFactoryException->getMessage());
 
                 switch ($message->getCommand()) {
-                    case 'set_work_mode':
-                        $this->setWorkMode($message, $from);
-                        break;
                     case 'add_op_message':
                         $this->operatorAddMessage($from, $msg);
                         break;
@@ -109,19 +104,13 @@ class MessageHandler implements MessageComponentInterface
                     case 'add_message':
                         $this->addMessage($message, $from, $msg);
                         break;
-                    case 'save_welcome_message':
-                        $this->saveWelcomeMessage($message); // returns command 'welcome_message'
-                        break;
-                    case 'save_timeout_message':
-                        $this->saveTimeoutMessage($message); // returns command 'timeout_message'
-                        break;
                     case 'ping':
                         $this->output->writeln('[ ping pong ]');
                         $this->operatorManager->ping();
                         break;
                 }
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->output->writeln(
                 $exception->getMessage()
                 . ' on line ' . $exception->getLine()
@@ -142,10 +131,10 @@ class MessageHandler implements MessageComponentInterface
 
     /**
      * @param ConnectionInterface $conn
-     * @param \Exception $e
+     * @param Exception $e
      * @return void
      */
-    public function onError(ConnectionInterface $conn, \Exception $e): void
+    public function onError(ConnectionInterface $conn, Exception $e): void
     {
         $this->closeConnections($conn);
         $conn->close();
@@ -158,11 +147,11 @@ class MessageHandler implements MessageComponentInterface
     private function closeConnections(ConnectionInterface $conn): void
     {
         if ($this->operatorConnections->del($conn)) {
-            $this->output->writeln("Close operator connection");
+            $this->output->writeln("[ close operator ]");
         }
         $session = $this->sessionsConnections->del($conn);
         if (false !== $session) {
-            $this->output->writeln("Close session connection $session");
+            $this->output->writeln("[ close session $session ]");
         }
     }
 }

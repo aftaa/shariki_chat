@@ -4,8 +4,10 @@ namespace App\Handler;
 
 use App\Manager\ChatManager;
 use App\Manager\OperatorManager;
+use App\Message;
 use App\Service\MessageService;
 use App\Service\WorkModeService;
+use App\Websocket\ConnectionResponse;
 use stdClass;
 use function Symfony\Component\String\u;
 
@@ -28,10 +30,10 @@ class OperatorHandler
 
     /**
      * @param string $className
-     * @return OperatorHandler|HandlerResponse
+     * @return OperatorHandler|ConnectionResponse
      * @throws FactoryException
      */
-    public function new(string $className): OperatorHandler|HandlerResponse
+    public function new(string $className): OperatorHandler|ConnectionResponse
     {
         $className = u($className)->camel();
         $className = ucfirst($className);

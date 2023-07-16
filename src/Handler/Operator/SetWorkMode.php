@@ -3,7 +3,7 @@
 namespace App\Handler\Operator;
 
 use App\Handler\OperatorHandler;
-use App\Handler\Message;
+use App\Message;
 
 class SetWorkMode extends OperatorHandler
 {
