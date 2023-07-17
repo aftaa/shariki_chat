@@ -31,15 +31,9 @@
         let socket;
     </script>
 
-    {% if local %}
-        <script>
-            let socket_addr = 'ws://localhost:3001?operator=1';
-        </script>
-    {% else %}
-        <script>
-            let socket_addr = 'wss://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai:3002?operator=1';
-        </script>
-    {% endif %}
+    <script>
+        let socket_addr = '{{ server.url }}?operator=1';
+    </script>
 
     <script type="text/javascript" src="{{ asset('js/desktop.js') }}?t={{ 'now'|date('U') }}"></script>
 {% endblock %}

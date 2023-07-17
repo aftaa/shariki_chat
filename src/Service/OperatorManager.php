@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Manager;
+namespace App\Service;
 
 use App\Entity\Session;
 use App\Repository\ChatRepository;

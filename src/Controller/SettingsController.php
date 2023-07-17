@@ -2,8 +2,7 @@
 
 namespace App\Controller;
 
-use App\Manager\ChatManager;
-use App\Manager\OperatorManager;
+use App\Service\ServerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,10 +10,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class SettingsController extends AbstractController
 {
     #[Route('/settings', name: 'app_settings')]
-    public function index(): Response
+    public function index(ServerService $serverService): Response
     {
         return $this->render('settings/index.html.twig', [
-            'local' =>'localhost' === $_SERVER['SERVER_NAME'],
+            'server' => $serverService->get(),
         ]);
     }
 }

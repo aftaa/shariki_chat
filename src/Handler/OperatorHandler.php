@@ -2,10 +2,10 @@
 
 namespace App\Handler;
 
-use App\Manager\ChatManager;
-use App\Manager\OperatorManager;
 use App\Message;
+use App\Service\ChatManager;
 use App\Service\MessageService;
+use App\Service\OperatorManager;
 use App\Service\WorkModeService;
 use App\Websocket\ConnectionResponse;
 use stdClass;
