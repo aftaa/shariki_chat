@@ -5,18 +5,7 @@
 {% block body %}
     <link rel="stylesheet" type="text/css" href="{{ asset('css/chat.all.css') }}?t={{ 'now'|date('U') }}">
 
-    <header>
-        <div id="status"></div>
-        <div>
-            <select id="work-mode" disabled>
-                <option>Бот</option>
-                <option>Оператор</option>
-            </select>
-        </div>
-    </header>
-
     <main>
-
     </main>
 
     <footer>
@@ -66,17 +55,13 @@
             socket = new WebSocket(url);
             socket.onopen = function () {
                 setStatus(true);
-                command({command: 'get_work_mode'});
-                command({command: 'get_sessions_all'});
+                command({command: 'operator_get_sessions'});
             }
             socket.onmessage = function (event) {
                 let message = JSON.parse(event.data);
                 switch (message.command) {
-                    case 'work_mode':
-                        setWorkMode(message.work_mode);
-                        break;
-                    case 'session':
-                        drawSession(message.session);
+                    case 'operator_get_session':
+                        drawSession(message.content);
                         break;
                     case 'new_message':
                         drawMessage(message);
@@ -101,34 +86,7 @@
 
         connect();
 
-        setInterval(() => command({command: 'ping'}), 23000);
-
-        function setWorkMode(workMode) {
-            let select = document.getElementById('work-mode');
-            switch (workMode) {
-                case 'bot':
-                    select.selectedIndex = 0;
-                    break;
-                case 'operator':
-                    select.selectedIndex = 1;
-            }
-            $(select).show();
-        }
-
-        $('#work-mode').on('change', function () {
-            let workMode;
-            switch (this.selectedIndex) {
-                case 0:
-                    workMode = 'bot';
-                    break;
-                case 1:
-                    workMode = 'operator';
-            }
-            command({
-                command: 'set_work_mode',
-                work_mode: workMode
-            });
-        })
+        setInterval(() => command({command: 'client_ping'}), 30000);
 
         function setStatus(connected) {
             status = connected;
@@ -167,13 +125,10 @@
             }
         }
 
-        $('.archive').on('click', function (event) {
-        })
-
         $('.session .open').on('click', function () {
             $('#messages-' + this.dataset.session).html('');
             command({
-                command: 'get_op_history',
+                command: 'operator_get_chat',
                 session: this.dataset.session
             });
             $('.chat').hide();

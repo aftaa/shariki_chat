@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Handler\Operator;
+namespace App\Handler\Client;
 
 use App\Handler\Handler;
 use App\Message\Message;
 
-class SetWorkMode extends Handler
+class Ping extends Handler
 {
     public function handle(Message $sessionMessage): object
     {
-        $this->workModeService->set($sessionMessage->getContent()->work_mode);
+        $this->workModeService->get('timeout');
         return parent::handle($sessionMessage);
     }
 }

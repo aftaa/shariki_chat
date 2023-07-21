@@ -1,4 +1,4 @@
-const timeout = 3000;
+const pingTimeout = 3000;
 
 function connect() {
     socket = new WebSocket(socket_addr);
@@ -6,17 +6,17 @@ function connect() {
         $('#status').html("Подключено");
 
         let command = {
-            command: 'get_work_mode'
+            command: 'operator_get_work_mode'
         };
         socket.send(JSON.stringify(command));
 
         command = {
-            command: 'get_welcome_message'
+            command: 'operator_get_welcome_message'
         };
         socket.send(JSON.stringify(command));
 
         command = {
-            command: 'get_timeout_message'
+            command: 'operator_get_timeout_message'
         };
         socket.send(JSON.stringify(command));
     });
@@ -24,7 +24,7 @@ function connect() {
     socket.addEventListener("message", function (e) {
         const message = JSON.parse(e.data);
         switch (message.command) {
-            case 'get_work_mode':
+            case 'operator_get_work_mode':
                 let work_mode = message.content.work_mode;
                 let select = document.getElementById('work-mode-select');
                 switch (work_mode) {
@@ -35,10 +35,10 @@ function connect() {
                         select.selectedIndex = 1;
                 }
                 break;
-            case 'get_welcome_message':
+            case 'operator_get_welcome_message':
                 $('#welcome-message input').val(message.content.welcome_message);
                 break;
-            case 'get_timeout_message':
+            case 'operator_get_timeout_message':
                 $('#timeout-message input').val(message.content.timeout_message);
                 break;
         }
@@ -54,10 +54,10 @@ connect();
 setInterval(function () {
     let status = $('#status').html();
     if ('Не подключено' === status) {
-        console.log('Подключаемся к серверу', socket_addr);
+        console.log('Подключаемся к серверу: ', socket_addr);
         connect();
     }
-}, timeout);
+}, pingTimeout);
 
 $('#work-mode-select').on('change', function () {
     let work_mode = $('option:selected', this).val();

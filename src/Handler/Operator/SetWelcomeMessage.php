@@ -2,14 +2,14 @@
 
 namespace App\Handler\Operator;
 
-use App\Handler\OperatorHandler;
-use App\Message;
+use App\Handler\Handler;
+use App\Message\Message;
 
-class SetWelcomeMessage extends OperatorHandler
+class SetWelcomeMessage extends Handler
 {
-    public function handle(Message $message): object
+    public function handle(Message $sessionMessage): object
     {
-        $this->messageService->set('welcome', $message->getContent()->welcome_message);
-        return parent::handle($message);
+        $this->messageService->set('welcome', $sessionMessage->getContent()->welcome_message);
+        return parent::handle($sessionMessage);
     }
 }

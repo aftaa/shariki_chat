@@ -2,8 +2,9 @@
 
 namespace App\Websocket;
 
-use App\Chat\Message;
 use App\Entity\Session;
+use App\Message\Message;
+use Exception;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Email;
@@ -14,7 +15,7 @@ trait MessageHandlerTrait
      * @param ConnectionInterface $connection
      * @param string $msg
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function operatorAddMessage(ConnectionInterface $connection, string $msg): void
     {
@@ -40,7 +41,7 @@ trait MessageHandlerTrait
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function operatorUpdateSession(string $sessionName): void
     {
@@ -68,8 +69,7 @@ trait MessageHandlerTrait
     /**
      * @param ConnectionInterface $connection
      * @return void
-     * @throws \Doctrine\DBAL\Exception
-     * @throws \Exception
+     * @throws Exception
      */
     public function operatorGetSessions(ConnectionInterface $connection): void
     {
@@ -106,49 +106,10 @@ trait MessageHandlerTrait
     }
 
     /**
-     * @param ConnectionInterface $connection
-     * @return void
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function operatorGetSessionsAll(ConnectionInterface $connection): void
-    {
-        $sessions = $this->operatorManager->getSessions();
-        $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
-        foreach ($sessions as $session) {
-//            if ($session['timediff'] > 3600 * 24) {
-//                continue;
-//            }
-            $format = $this->chatDateManager->format($session['last_message']);
-//            if ('-' === $format) {
-//                continue;
-//            }
-//
-//            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
-//                continue;
-//            }
-
-            $msg = (object)[
-                'command' => 'session',
-                'session' => (object)[
-                    'name' => $session['session'],
-                    'id' => $session['id'],
-                    'last_message' => $format,
-                    'started' => $this->chatDateManager->format($session['started']),
-                    'message_count' => $session['message_count'],
-                    'has_new_message' => $session['has_new_message'],
-                    'hidden' => !$session['has_new_message1'] && 1 == $session['message_count'],
-                ],
-            ];
-            $msg = json_encode($msg, JSON_FORCE_OBJECT);
-            $connection->send($msg);
-        }
-    }
-
-    /**
      * @param mixed $message
      * @param ConnectionInterface $connection
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function getHistory(mixed $message, ConnectionInterface $connection): void
     {
@@ -189,14 +150,14 @@ trait MessageHandlerTrait
     }
 
     /**
-     * @param mixed $message
+     * @param Message $message
      * @param ConnectionInterface $connection
      * @return void
-     * @throws \Exception
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function operatorGetHistory(mixed $message, ConnectionInterface $connection): void
+    public function operatorGetHistory(Message $message, ConnectionInterface $connection): void
     {
-        [$session, $isNewSession] = $this->chatManager->getSession($message->session);
+        [$session, $isNewSession] = $this->chatManager->getSession($message->content->session);
         $chats = $this->chatManager->getChats($session);
         $this->output->writeln('Found messages: ' . count($chats));
         if (count($chats)) {
@@ -220,7 +181,7 @@ trait MessageHandlerTrait
      * @param ConnectionInterface $connection
      * @param string $msg
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @throws TransportExceptionInterface
      */
     public function addMessage(mixed $message, ConnectionInterface $connection, string $msg): void
@@ -288,7 +249,7 @@ trait MessageHandlerTrait
     /**
      * @param Session $session
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function operatorNewSession(Session $session): void
     {
@@ -311,7 +272,7 @@ trait MessageHandlerTrait
      * @param mixed $message
      * @param ConnectionInterface $connection
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     private function setWorkMode(mixed $message, ConnectionInterface $connection): void
     {

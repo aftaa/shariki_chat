@@ -2,20 +2,24 @@
 
 namespace App\Service;
 
-class ChatDateManager
+use DateTime;
+use DateTimeInterface;
+use Exception;
+
+class DateService
 {
     /**
-     * @param string|\DateTimeInterface|null $datetime
+     * @param string|DateTimeInterface|null $datetime
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
-    public function format(null|string|\DateTimeInterface $datetime): string
+    public function format(null|string|DateTimeInterface $datetime): string
     {
         if (null === $datetime) {
             return '-';
         }
-        if (!$datetime instanceof \DateTimeInterface) {
-            $date = new \DateTime($datetime);
+        if (!$datetime instanceof DateTimeInterface) {
+            $date = new DateTime($datetime);
         } else {
             $date = $datetime;
         }

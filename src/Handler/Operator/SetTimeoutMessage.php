@@ -2,14 +2,14 @@
 
 namespace App\Handler\Operator;
 
-use App\Handler\OperatorHandler;
-use App\Message;
+use App\Handler\Handler;
+use App\Message\Message;
 
-class SetTimeoutMessage extends OperatorHandler
+class SetTimeoutMessage extends Handler
 {
-    public function handle(Message $message): object
+    public function handle(Message $sessionMessage): object
     {
-        $this->messageService->set('timeout', $message->getContent()->timeout_message);
-        return parent::handle($message);
+        $this->messageService->set('timeout', $sessionMessage->getContent()->timeout_message);
+        return parent::handle($sessionMessage);
     }
 }

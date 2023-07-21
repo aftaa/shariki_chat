@@ -6,7 +6,7 @@ use App\Repository\PushSubRepository;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\WebPush;
 
-readonly class WebPushManager
+readonly class PushSubService
 {
     private array $auth;
 

@@ -2,12 +2,12 @@
 
 namespace App\Handler\Operator;
 
-use App\Handler\OperatorHandler;
-use App\Message;
+use App\Handler\Handler;
+use App\Message\Message;
 
-class GetWelcomeMessage extends OperatorHandler
+class GetWelcomeMessage extends Handler
 {
-    public function handle(Message $message): object
+    public function handle(Message $sessionMessage): object
     {
         $welcomeMessage = $this->messageService->get('welcome');
         return (object)[

@@ -4,7 +4,7 @@ namespace App\Handler;
 
 use Exception;
 
-class FactoryException extends Exception
+class HandlerException extends Exception
 {
 
 }

@@ -2,12 +2,12 @@
 
 namespace App\Handler\Operator;
 
-use App\Handler\OperatorHandler;
-use App\Message;
+use App\Handler\Handler;
+use App\Message\Message;
 
-class GetWorkMode extends OperatorHandler
+class GetWorkMode extends Handler
 {
-    public function handle(Message $message): object
+    public function handle(Message $sessionMessage): object
     {
         $workMode = $this->workModeService->get();
         return (object)[

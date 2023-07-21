@@ -10,7 +10,7 @@ use App\Repository\MessageRepository;
 use App\Repository\SessionRepository;
 use Doctrine\ORM\NonUniqueResultException;
 
-class ChatManager
+class ChatService
 {
     public function __construct(
         public ChatRepository    $chatRepository,

@@ -2,14 +2,16 @@
 
 namespace App\Websocket;
 
-use App\Handler\FactoryException;
+use App\Handler\Handler;
+use App\Handler\HandlerException;
 use App\Handler\OperatorFactory;
-use App\Handler\OperatorHandler;
-use App\Message;
-use App\Service\ChatDateManager;
-use App\Service\ChatManager;
+use App\Message\Message;
+use App\Message\SessionsMessage;
+use App\Service\ChatService;
+use App\Service\DateService;
 use App\Service\OperatorManager;
-use App\Service\WebPushManager;
+use App\Service\PushSubService;
+use App\Service\SessionService;
 use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -29,15 +31,15 @@ class MessageHandler implements MessageComponentInterface
     private array $sessions = [];
 
     public function __construct(
-        private ChatManager        $chatManager,
-        private OperatorManager    $operatorManager,
-        private MailerInterface    $mailer,
-        private WebPushManager     $pushManager,
-        private OperatorHandler    $operatorHandler,
-        private ConnectionResponse $handlerResponse,
-        private ConnectionManager  $operatorConnections = new ConnectionManager(),
-        private SessionManager     $sessionsConnections = new SessionManager(),
-        private ChatDateManager    $chatDateManager = new ChatDateManager(),
+        private readonly ChatService        $chatManager,
+        private readonly SessionService     $sessionService,
+        private readonly MailerInterface    $mailer,
+        private readonly PushSubService     $pushManager,
+        private readonly Handler            $handler,
+        private readonly ConnectionResponse $handlerResponse,
+        private ConnectionManager           $operatorConnections = new ConnectionManager(),
+        private SessionManager              $sessionsConnections = new SessionManager(),
+        private DateService                 $chatDateManager = new DateService(),
     )
     {
     }
@@ -75,14 +77,20 @@ class MessageHandler implements MessageComponentInterface
             $this->output->writeln("[ {$message->getCommand()} ]");
 
             try {
-                $messageContent = $this->operatorHandler->new($message->getCommand())->handle($message);
+                // обработка команды
+                $messageContent = $this->handler->build($message->getCommand())->handle($message);
 
-                $this->handlerResponse->send($from, new Message(
-                    $message->getCommand(),
-                    $messageContent,
-                ));
+                // отправка ответа
+                if ($messageContent instanceof SessionsMessage) {
+                    $this->handlerResponse->sendSessions($from, $messageContent);
+                } else {
+                    $this->handlerResponse->send($from, new Message(
+                        $message->getCommand(),
+                        $messageContent,
+                    ));
+                }
 
-            } catch (FactoryException $messageHandlerFactoryException) {
+            } catch (HandlerException $messageHandlerFactoryException) {
                 $this->output->writeln($messageHandlerFactoryException->getMessage());
 
                 switch ($message->getCommand()) {
@@ -92,9 +100,6 @@ class MessageHandler implements MessageComponentInterface
                     case 'get_sessions':
                         $this->operatorGetSessions($from);
                         break;
-                    case 'get_sessions_all':
-                        $this->operatorGetSessionsAll($from);
-                        break;
                     case 'get_history':
                         $this->getHistory($message, $from);
                         break;
@@ -103,10 +108,6 @@ class MessageHandler implements MessageComponentInterface
                         break;
                     case 'add_message':
                         $this->addMessage($message, $from, $msg);
-                        break;
-                    case 'ping':
-                        $this->output->writeln('[ ping pong ]');
-                        $this->operatorManager->ping();
                         break;
                 }
             }
