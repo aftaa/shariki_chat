@@ -29,7 +29,7 @@ final class ConnectionResponse
 
     public function sendChats(ConnectionInterface $connection, ChatMessages $chatMessages): void
     {
-        foreach ($chatMessages as $chatMessage) {
+        foreach ($chatMessages->chats as $chatMessage) {
             $message = new Message(
                 'operator_get_chat',
                 $chatMessage,

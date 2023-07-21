@@ -18,7 +18,7 @@ class GetSessions extends Handler
     public function handle(Message $message): SessionMessages
     {
         $sessions = $this->sessionService->getSessions();
-        $sessionsMessage = new SessionMessages();
+        $sessionMessages = new SessionMessages();
         foreach ($sessions as $session) {
             $sessionMessage = new SessionMessage(
                 $session['id'],
@@ -29,8 +29,8 @@ class GetSessions extends Handler
                 (bool)$session['has_new_message'],
                 (bool)!$session['has_new_message1'] && 1 == $session['message_count'],
             );
-            $sessionsMessage->sessions[] = $sessionMessage;
+            $sessionMessages->sessions[] = $sessionMessage;
         }
-        return $sessionsMessage;
+        return $sessionMessages;
     }
 }
