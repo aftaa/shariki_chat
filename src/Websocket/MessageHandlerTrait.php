@@ -150,33 +150,6 @@ trait MessageHandlerTrait
     }
 
     /**
-     * @param Message $message
-     * @param ConnectionInterface $connection
-     * @return void
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function operatorGetHistory(Message $message, ConnectionInterface $connection): void
-    {
-        [$session, $isNewSession] = $this->chatManager->getSession($message->content->session);
-        $chats = $this->chatManager->getChats($session);
-        $this->output->writeln('Found messages: ' . count($chats));
-        if (count($chats)) {
-            foreach ($chats as $chat) {
-                $message = new Message(
-                    name: $chat->getName(),
-                    message: $chat->getMessage(),
-                    session: (string)$chat->getSession(),
-                    command: 'new_message',
-                    isOperator: $chat->isIsOperator(),
-                    created: $this->chatDateManager->format($chat->getCreated()),
-                );
-                $msg = json_encode($message);
-                $connection->send($msg);
-            }
-        }
-    }
-
-    /**
      * @param mixed $message
      * @param ConnectionInterface $connection
      * @param string $msg

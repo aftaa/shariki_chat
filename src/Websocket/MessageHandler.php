@@ -5,8 +5,9 @@ namespace App\Websocket;
 use App\Handler\Handler;
 use App\Handler\HandlerException;
 use App\Handler\OperatorFactory;
+use App\Message\ChatMessages;
 use App\Message\Message;
-use App\Message\SessionsMessage;
+use App\Message\SessionMessages;
 use App\Service\ChatService;
 use App\Service\DateService;
 use App\Service\OperatorManager;
@@ -81,10 +82,12 @@ class MessageHandler implements MessageComponentInterface
                 $messageContent = $this->handler->build($message->getCommand())->handle($message);
 
                 // отправка ответа
-                if ($messageContent instanceof SessionsMessage) {
+                if ($messageContent instanceof ChatMessages) {
+                    $this->handlerResponse->sendChats($from, $messageContent);
+                } elseif ($messageContent instanceof SessionMessages) {
                     $this->handlerResponse->sendSessions($from, $messageContent);
                 } else {
-                    $this->handlerResponse->send($from, new Message(
+                    $this->handlerResponse->sendMessage($from, new Message(
                         $message->getCommand(),
                         $messageContent,
                     ));

@@ -5,20 +5,20 @@ namespace App\Handler\Operator;
 use App\Handler\Handler;
 use App\Message\Message;
 use App\Message\SessionMessage;
-use App\Message\SessionsMessage;
+use App\Message\SessionMessages;
 use Exception;
 
 class GetSessions extends Handler
 {
     /**
      * @param Message $message
-     * @return object|array
+     * @return SessionMessages
      * @throws Exception
      */
-    public function handle(Message $message): object|array
+    public function handle(Message $message): SessionMessages
     {
         $sessions = $this->sessionService->getSessions();
-        $sessionsMessage = new SessionsMessage();
+        $sessionsMessage = new SessionMessages();
         foreach ($sessions as $session) {
             $sessionMessage = new SessionMessage(
                 $session['id'],

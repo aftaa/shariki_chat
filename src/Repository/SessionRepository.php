@@ -42,19 +42,6 @@ class SessionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @throws NonUniqueResultException
-     */
-    public function getSession(string $sessionKey): ?Session
-    {
-        return $this
-            ->createQueryBuilder('s')
-            ->where('s.name = :sessionKey')
-            ->setParameter(':sessionKey', $sessionKey)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    /**
      * @throws Exception
      */
     public function getSessions(): array

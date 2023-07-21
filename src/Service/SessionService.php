@@ -32,4 +32,9 @@ class SessionService
     {
         return $this->sessionRepository->getSessionData($sessionName);
     }
+
+    public function get(string $name): ?Session
+    {
+        return $this->sessionRepository->findOneBy(['name' => $name]);
+    }
 }
