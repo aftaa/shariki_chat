@@ -24,12 +24,16 @@ class GetChat extends HandlerAlias
 
         if (count($chats)) {
             foreach ($chats as $chat) {
-                $message = new ChatMessage(
+                $chatMessage = new ChatMessage(
                     $session->getName(),
                     $chat->getName(),
                     $chat->getMessage(),
                     $chat->isIsOperator(),
                     $this->dateService->format($chat->getCreated()),
+                );
+                $message = new Message(
+                    'client_get_chat',
+                    $chatMessage,
                 );
                 $msg = json_encode($message);
                 $this->sessionsConnections->send($session->getName(), $msg);
@@ -51,6 +55,10 @@ class GetChat extends HandlerAlias
             $chat->setCreated(new DateTime());
             $this->chatService->add($chat);
 
+            $message = new Message(
+                'client_get_chat',
+                $answer,
+            );
             $msg = json_encode($answer);
             $this->sessionsConnections->send($session->getName(), $msg);
         }
