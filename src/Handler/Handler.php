@@ -7,10 +7,12 @@ use App\Service\ChatService;
 use App\Service\ConnectionService;
 use App\Service\DateService;
 use App\Service\MessageService;
+use App\Service\PushSubService;
 use App\Service\SessionConnectionService;
 use App\Service\SessionService;
 use App\Service\WorkModeService;
 use stdClass;
+use Symfony\Component\Mailer\MailerInterface;
 use function Symfony\Component\String\u;
 
 class Handler
@@ -21,6 +23,8 @@ class Handler
         protected SessionService            $sessionService,
         protected WorkModeService           $workModeService,
         protected DateService               $dateService,
+        protected MailerInterface           $mailer,
+        protected PushSubService            $pushSubService,
         protected ?ConnectionService        $operatorConnections = null,
         protected ?SessionConnectionService $sessionsConnections = null,
     )
@@ -54,6 +58,8 @@ class Handler
             $this->sessionService,
             $this->workModeService,
             $this->dateService,
+            $this->mailer,
+            $this->pushSubService,
         );
     }
 
