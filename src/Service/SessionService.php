@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Session;
 use App\Repository\SessionRepository;
+use DateTime;
 use Doctrine\DBAL\Exception;
 
 class SessionService
@@ -35,6 +36,14 @@ class SessionService
 
     public function get(string $name): ?Session
     {
-        return $this->sessionRepository->findOneBy(['name' => $name]);
+        $session = $this->sessionRepository->findOneBy(['name' => $name]);
+        if (!$session) {
+            $session = new Session();
+            $session->setName($name);
+            $session->setSessionStarted(new DateTime());
+            $session->setLastMessage(null);
+            $this->sessionRepository->save($session, true);
+        }
+        return $session;
     }
 }
