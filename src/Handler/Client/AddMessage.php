@@ -7,6 +7,7 @@ use App\Handler\Handler;
 use App\Message\ChatMessage;
 use App\Message\Message;
 use DateTime;
+use Exception;
 use stdClass;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
@@ -16,7 +17,7 @@ class AddMessage extends Handler
 {
     /**
      * @throws TransportExceptionInterface
-     * @throws \Exception
+     * @throws Exception
      */
     public function handle(Message $message): object
     {
@@ -31,7 +32,7 @@ class AddMessage extends Handler
         $this->chatService->add($chat);
 
         $message = new Message(
-            'client_get_message',
+            'new_message',
             new ChatMessage(
                 $session->getName(),
                 $chat->getName(),
