@@ -60,9 +60,9 @@ class SessionRepository extends ServiceEntityRepository
             (SELECT NOT is_operator FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
                 OR 
             (SELECT "Чат-бот" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
-                AS has_new_message, 
+                AS has_operaror_get_chat, 
             (SELECT "Вы" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
-                AS has_new_message1 
+                AS has_operaror_get_chat1 
             FROM session s 
             ORDER BY last_message DESC
         ';
@@ -89,9 +89,9 @@ class SessionRepository extends ServiceEntityRepository
                 (SELECT NOT is_operator FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
                     OR 
                 (SELECT "Чат-бот" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
-                    AS has_new_message, 
+                    AS has_operaror_get_chat, 
                 (SELECT "Вы" = name FROM chat WHERE s.id=session_id ORDER BY created DESC LIMIT 1) 
-                    AS has_new_message1 
+                    AS has_operaror_get_chat1 
             FROM session s
             WHERE s.name = "' . $sessionName . '"
         ';

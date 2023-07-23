@@ -25,7 +25,7 @@ trait MessageHandlerTrait
         $chat = $this->chatManager->addMessage($session, $message);
         $message = json_decode($msg);
         $message->created = $this->chatDateManager->format($chat->getCreated());
-        $message->command = 'new_message';
+        $message->command = 'operaror_get_chat';
         $msg = json_encode($message);
         $this->operatorConnections->send($msg);
         $this->sessionsConnections->send($session->getName(), $msg);
@@ -58,9 +58,9 @@ trait MessageHandlerTrait
                 'last_message' => $this->chatDateManager->format($data['last_message']),
                 'started' => $this->chatDateManager->format($data['started']),
                 'message_count' => $data['message_count'],
-                'has_new_message' => $data['has_new_message'],
-                'has_new_message1' => $data['has_new_message1'],
-                'hidden' => !$data['has_new_message1'] && 1 == $data['message_count'],]
+                'has_operaror_get_chat' => $data['has_operaror_get_chat'],
+                'has_operaror_get_chat1' => $data['has_operaror_get_chat1'],
+                'hidden' => !$data['has_operaror_get_chat1'] && 1 == $data['message_count'],]
         ];
         $msg = json_encode($message);
         $this->operatorConnections->send($msg);
@@ -87,7 +87,7 @@ trait MessageHandlerTrait
                     name: $chat->getName(),
                     message: $chat->getMessage(),
                     session: (string)$chat->getSession(),
-                    command: 'new_message',
+                    command: 'operaror_get_chat',
                     isOperator: $chat->isIsOperator(),
                 );
                 $msg = json_encode($message);
@@ -98,7 +98,7 @@ trait MessageHandlerTrait
                 name: 'Чат-бот',
                 message: $this->chatManager->botWelcomeMessage(),
                 session: $session->getName(),
-                command: 'new_message',
+                command: 'operaror_get_chat',
                 isOperator: true,
             );
             $this->chatManager->addMessage($session, $answer);
@@ -127,7 +127,7 @@ trait MessageHandlerTrait
         $chat = $this->chatManager->addMessage($session, $message);
         $message->created = $this->chatDateManager->format($chat->getCreated());
         $message = json_decode($msg);
-        $message->command = 'new_message';
+        $message->command = 'operaror_get_chat';
         $message->push_notification = true;
         $msg = json_encode($message);
         $this->sessionsConnections->send($session->getName(), $msg);
@@ -150,7 +150,7 @@ trait MessageHandlerTrait
                 name: 'Чат-бот',
                 message: $this->chatManager->botTimeoutMessage(),
                 session: $session->getName(),
-                command: 'new_message',
+                command: 'operaror_get_chat',
                 isOperator: true,
             );
             $chat = $this->chatManager->addMessage($session, $message);

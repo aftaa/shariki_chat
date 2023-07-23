@@ -32,8 +32,8 @@ class GetSessions extends Handler
                 $this->dateService->format($session['started']),
                 $this->dateService->format($session['last_message']),
                 $session['message_count'],
-                (bool)$session['has_new_message'],
-                (bool)!$session['has_new_message1'] && 1 == $session['message_count'],
+                (bool)$session['has_operaror_get_chat'],
+                (bool)!$session['has_operaror_get_chat1'] && 1 == $session['message_count'],
             );
             $sessionMessages[] = $sessionMessage;
         }
@@ -52,7 +52,7 @@ class GetSessions extends Handler
         if ('-' === $format) {
             return true;
         }
-        if (!$session['has_new_message1'] && 1 == $session['message_count']) {
+        if (!$session['has_operaror_get_chat1'] && 1 == $session['message_count']) {
             return true;
         }
         return false;

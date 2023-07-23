@@ -34,7 +34,7 @@ class AddMessage extends Handler
         );
 
         $message = new Message(
-            'new_message',
+            'operaror_get_chat',
             $chatMessage,
         );
 
@@ -62,9 +62,9 @@ class AddMessage extends Handler
                     'last_message' => $this->dateService->format($data['last_message']),
                     'started' => $this->dateService->format($data['started']),
                     'message_count' => $data['message_count'],
-                    'has_new_message' => $data['has_new_message'],
-                    'has_new_message1' => $data['has_new_message1'],
-                    'hidden' => !$data['has_new_message1'] && 1 == $data['message_count'],
+                    'has_operaror_get_chat' => $data['has_operaror_get_chat'],
+                    'has_operaror_get_chat1' => $data['has_operaror_get_chat1'],
+                    'hidden' => !$data['has_operaror_get_chat1'] && 1 == $data['message_count'],
                 ],
             );
             $messageEncoded = json_encode($message);
