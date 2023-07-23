@@ -67,45 +67,6 @@ trait MessageHandlerTrait
     }
 
     /**
-     * @param ConnectionInterface $connection
-     * @return void
-     * @throws Exception
-     */
-    public function operatorGetSessions(ConnectionInterface $connection): void
-    {
-        $sessions = $this->operatorManager->getSessions();
-        $this->output->writeln('OPERATOR Found sessions: ' . count($sessions));
-        foreach ($sessions as $session) {
-            if ($session['timediff'] > 3600 * 24) {
-                continue;
-            }
-            $format = $this->chatDateManager->format($session['last_message']);
-            if ('-' === $format) {
-                continue;
-            }
-
-            if (!$session['has_new_message1'] && 1 == $session['message_count']) {
-                continue;
-            }
-
-            $msg = (object)[
-                'command' => 'session',
-                'session' => (object)[
-                    'name' => $session['session'],
-                    'id' => $session['id'],
-                    'last_message' => $format,
-                    'started' => $this->chatDateManager->format($session['started']),
-                    'message_count' => $session['message_count'],
-                    'has_new_message' => $session['has_new_message'],
-                    'hidden' => !$session['has_new_message1'] && 1 == $session['message_count'],
-                ],
-            ];
-            $msg = json_encode($msg, JSON_FORCE_OBJECT);
-            $connection->send($msg);
-        }
-    }
-
-    /**
      * @param mixed $message
      * @param ConnectionInterface $connection
      * @return void
@@ -176,13 +137,13 @@ trait MessageHandlerTrait
             $this->pushManager->webPushSend($message->message);
         }
 
-        $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
-        $email = (new Email())
-            ->from('info@gelievyeshari24.ru')
-            ->addTo(...$emailTo)
-            ->subject('Чат: ' . $message->message)
-            ->text($message->message);
-        $this->mailer->send($email);
+//        $emailTo = ['info@gelievyeshari24.ru', 'mail@max-after.ru'];
+//        $email = (new Email())
+//            ->from('info@gelievyeshari24.ru')
+//            ->addTo(...$emailTo)
+//            ->subject('Чат: ' . $message->message)
+//            ->text($message->message);
+//        $this->mailer->send($email);
 
         if ('bot' === $this->operatorManager->getWorkMode()) {
             $message = new Message(
@@ -201,109 +162,5 @@ trait MessageHandlerTrait
 
         $this->operatorUpdateSession($session->getName());
     }
-
-    /**
-     * @param ConnectionInterface $connection
-     * @return void
-     */
-    private function getWorkMode(ConnectionInterface $connection): void
-    {
-        $this->output->writeln('Querying Work Mode');
-        $workMode = $this->operatorManager->getWorkMode();
-        $this->output->writeln('Work Mode is: ' . $workMode);
-        $message = (object)[
-            'command' => 'work_mode',
-            'work_mode' => $workMode,
-        ];
-        $msg = json_encode($message);
-        $connection->send($msg);
-    }
-
-    /**
-     * @param Session $session
-     * @return void
-     * @throws Exception
-     */
-    public function operatorNewSession(Session $session): void
-    {
-        $message = (object)[
-            'command' => 'new_session',
-            'session' => (object)[
-                'name' => $session->getName(),
-                'id' => $session->getId(),
-                'message_count' => 1,
-                'last_message' => $this->chatDateManager->format(new \DateTime()),
-                'started' => $this->chatDateManager->format(new \DateTime()),
-                'has_new_message' => true,
-            ],
-        ];
-        $msg = json_encode($message);
-        $this->operatorConnections->send($msg);
-    }
-
-    /**
-     * @param mixed $message
-     * @param ConnectionInterface $connection
-     * @return void
-     * @throws Exception
-     */
-    private function setWorkMode(mixed $message, ConnectionInterface $connection): void
-    {
-        $this->operatorManager->setWorkMode($message->work_mode);
-        $message = (object)[
-            'command' => 'work_mode',
-            'work_mode' => $message->work_mode,
-        ];
-        $msg = json_encode($message);
-        $this->operatorConnections->send($msg);
-        $this->sessionsConnections->sendAll($msg);
-    }
-
-    /**
-     * @return void
-     */
-    private function loadWelcomeMessage(): void
-    {
-        $welcomeMessage = $this->chatManager->botWelcomeMessage();
-        $message = (object)[
-            'command' => 'welcome_message',
-            'message' => $welcomeMessage,
-        ];
-        $msg = json_encode($message);
-        $this->operatorConnections->send($msg);
-    }
-
-    /**
-     * @return void
-     */
-    private function loadTimeoutMessage(): void
-    {
-        $timeoutMessage = $this->chatManager->botTimeoutMessage();
-        $message = (object)[
-            'command' => 'timeout_message',
-            'message' => $timeoutMessage,
-        ];
-        $msg = json_encode($message);
-        $this->operatorConnections->send($msg);
-    }
-
-    /**
-     * @param object $welcomeMessage
-     * @return void
-     */
-    private function saveWelcomeMessage(object $welcomeMessage): void
-    {
-        $this->chatManager->updateWelcomeMessage($welcomeMessage->message);
-        $this->loadWelcomeMessage();
-    }
-
-    /**
-     * @param object $timeoutMessage
-     * @return void
-     */
-    private function saveTimeoutMessage(object $timeoutMessage): void
-    {
-        $this->chatManager->updateTimeoutMessage($timeoutMessage->message);
-        $this->loadTimeoutMessage();
     }
 }

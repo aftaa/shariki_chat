@@ -13,14 +13,6 @@ class ConnectionManager
     private array $connections = [];
 
     /**
-     * @param ConnectionInterface $newConn
-     * @return bool
-     */
-    public function exists(ConnectionInterface $newConn): bool
-    {
-        return in_array($newConn, $this->connections, true);
-    }
-    /**
      * @param ConnectionInterface $connection
      * @return void
      */
@@ -29,6 +21,15 @@ class ConnectionManager
         if (!$this->exists($connection)) {
             $this->connections[] = $connection;
         }
+    }
+
+    /**
+     * @param ConnectionInterface $newConn
+     * @return bool
+     */
+    public function exists(ConnectionInterface $newConn): bool
+    {
+        return in_array($newConn, $this->connections, true);
     }
 
     /**
