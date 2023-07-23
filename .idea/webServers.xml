@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="74788ea4-560d-4801-b175-14f2f48758ca" name="gabidullin.site" url="https://vsetigoroda.ru/">
+        <fileTransfer rootFolder="/var/www/chat-server" accessType="SFTP" host="gabidullin.site" port="2200" sshConfigId="cb75bf0d-1874-477c-a43a-23d40fc273d1" sshConfig="max@gabidullin.site:2200 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

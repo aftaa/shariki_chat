@@ -62,7 +62,7 @@ setInterval(function () {
 $('#work-mode-select').on('change', function () {
     let work_mode = $('option:selected', this).val();
     let message = {
-        command: 'set_work_mode',
+        command: 'operator_set_work_mode',
         content: {
             work_mode: work_mode
         }
@@ -74,7 +74,7 @@ $('#work-mode-select').on('change', function () {
 $('#welcome-message button').on('click', function () {
     let welcome_message = $('#welcome-message input').val();
     let message = {
-        command: 'set_welcome_message',
+        command: 'operator_set_welcome_message',
         content: {
             welcome_message: welcome_message
         }
@@ -86,7 +86,7 @@ $('#welcome-message button').on('click', function () {
 $('#timeout-message button').on('click', function () {
     let timeout_message = $('#timeout-message input').val();
     let message = {
-        command: 'set_timeout_message',
+        command: 'operator_set_timeout_message',
         content: {
             timeout_message: timeout_message
         }
