@@ -80,7 +80,7 @@ $(function () {
     $('.session .open').on('click', function () {
         $('#messages-' + this.dataset.session).html('');
         command({
-            command: 'operator_get_chat',
+            command: 'new_message',
             session: this.dataset.session
         });
         $('.chat').hide();

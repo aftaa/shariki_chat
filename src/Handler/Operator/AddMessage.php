@@ -34,7 +34,7 @@ class AddMessage extends Handler
         );
 
         $message = new Message(
-            'operator_get_chat',
+            'new_message',
             $chatMessage,
         );
 

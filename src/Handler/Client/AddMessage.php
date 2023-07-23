@@ -63,7 +63,7 @@ class AddMessage extends Handler
                 true,
                 $this->dateService->format(new DateTime()),
             );
-            $message = new Message('client_get_chat', $chatMessage);
+            $message = new Message('new_message', $chatMessage);
             $msg = json_encode($message);
             $this->operatorConnections->send($msg);
             $this->sessionsConnections->send($session->getName(), $msg);

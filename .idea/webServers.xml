@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="984bf105-43da-4ca9-bb24-b5cfb6611e93" name="shariki_chat" url="https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/">
+        <fileTransfer rootFolder="/var/www/shariki_chat" accessType="SFTP" host="data-files.ru" port="22" sshConfigId="c92acf38-acc5-4aec-be3d-4c65c7c7dede" sshConfig="max@data-files.ru:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions keepAliveTimeout="0" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

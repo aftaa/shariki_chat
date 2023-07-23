@@ -30,7 +30,7 @@ final class ConnectionResponse
     {
         foreach ($chatMessages as $chatMessage) {
             $message = new Message(
-                'operator_get_chat',
+                'new_message',
                 $chatMessage,
             );
             $this->sendMessage($connection, $message);
