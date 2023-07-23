@@ -46,15 +46,8 @@ class AddMessage extends Handler
         $this->sessionsConnections->send($session->getName(), $msg);
         $this->operatorConnections->send($msg);
 
-        $this->pushSubService->webPushSend($chat->getMessage());
-
-        $email = (new Email())
-            ->from(new Address($_ENV['EMAIL_FROM_ADDRESS'], $_ENV['EMAIL_FROM_NAME']))
-            ->addTo($_ENV['EMAIL_TO'])
-            ->bcc($_ENV['EMAIL_BCC'])
-            ->subject('Чат: ' . $chat->getMessage())
-            ->text($chat->getMessage());
-        $this->mailer->send($email);
+//        $this->pushSubService->webPushSend($chat->getMessage());
+//        $this->sendMail($chat);
 
         if ('bot' === $this->workModeService->get()) {
             $chatMessage = new ChatMessage(
@@ -79,5 +72,21 @@ class AddMessage extends Handler
         }
 
         return new stdClass();
+    }
+
+    /**
+     * @param Chat $chat
+     * @return void
+     * @throws TransportExceptionInterface
+     */
+    public function sendMail(Chat $chat): void
+    {
+        $email = (new Email())
+            ->from(new Address($_ENV['EMAIL_FROM_ADDRESS'], $_ENV['EMAIL_FROM_NAME']))
+            ->addTo($_ENV['EMAIL_TO'])
+            ->bcc($_ENV['EMAIL_BCC'])
+            ->subject('Чат: ' . $chat->getMessage())
+            ->text($chat->getMessage());
+        $this->mailer->send($email);
     }
 }
