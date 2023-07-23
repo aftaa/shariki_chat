@@ -41,7 +41,7 @@ class SessionService
             $session = new Session();
             $session->setName($name);
             $session->setSessionStarted(new DateTime());
-            $session->setLastMessage(null);
+            $session->setLastMessage(new DateTime());
             $this->sessionRepository->save($session, true);
         }
         return $session;
