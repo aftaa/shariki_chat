@@ -3,20 +3,17 @@
 namespace App\Service;
 
 use App\Entity\Chat;
+use App\Entity\Message;
 use App\Entity\Session;
-use App\Message\ChatMessage;
 use App\Repository\ChatRepository;
 use App\Repository\MessageRepository;
 use App\Repository\SessionRepository;
 use DateTime;
-use Doctrine\ORM\NonUniqueResultException;
 
-class ChatService
+readonly class ChatService
 {
     public function __construct(
-        public ChatRepository    $chatRepository,
-        public SessionRepository $sessionRepository,
-        public MessageRepository $messageRepository,
+        private ChatRepository $chatRepository,
     )
     {
     }
@@ -34,27 +31,18 @@ class ChatService
             $session = new Session();
             $session
                 ->setName($name)
-                ->setSessionStarted(new DateTime())
-            ;
+                ->setSessionStarted(new DateTime());
             $this->sessionRepository->save($session, true);
         }
         return [$session, $isNewSession];
     }
 
     /**
-     * @param Session $session
-     * @param ChatMessage|\stdClass $message
+     * @param Chat $chat
      * @return Chat
      */
-    public function addMessage(Session $session, ChatMessage|\stdClass $message): Chat
+    public function add(Chat $chat): Chat
     {
-        $chat = new Chat();
-        $chat
-            ->setSession($session)
-            ->setName($message->name)
-            ->setMessage($message->message)
-            ->setCreated(new DateTime())
-            ->setIsOperator($message->isOperator);
         $this->chatRepository->save($chat, true);
         return $chat;
     }

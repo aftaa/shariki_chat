@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Websocket;
+namespace App\Service;
 
 use Ratchet\ConnectionInterface;
 
-class SessionManager
+class SessionConnectionService
 {
     /**
-     * @var ConnectionManager[]
+     * @var ConnectionService[]
      */
     private array $sessions = [];
 
@@ -19,7 +19,7 @@ class SessionManager
     public function add(string $session, ConnectionInterface $connection): void
     {
         if (!array_key_exists($session, $this->sessions)) {
-            $this->sessions[$session] = new ConnectionManager();
+            $this->sessions[$session] = new ConnectionService();
         }
         $this->sessions[$session]->add($connection);
     }

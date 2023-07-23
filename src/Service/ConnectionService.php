@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Websocket;
+namespace App\Service;
 
 use Ratchet\ConnectionInterface;
-use Ratchet\MessageComponentInterface;
 
-class ConnectionManager
+class ConnectionService
 {
     /**
      * @var ConnectionInterface[]

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Repository\PushSubRepository;
+use App\Repository\ServerRepository;
 use Minishlink\WebPush\Subscription;
 use Minishlink\WebPush\WebPush;
 
@@ -12,6 +13,7 @@ readonly class PushSubService
 
     public function __construct(
         private PushSubRepository $pushSubRepository,
+        private ServerRepository $serverRepository,
     )
     {
         $this->auth = [
@@ -26,6 +28,8 @@ readonly class PushSubService
      */
     public function webPushSend(string $message): void
     {
+        $server = $this->serverRepository->findOneBy(['active' => true]);
+
         $subs = $this->pushSubRepository->findAll();
         foreach ($subs as $sub) {
             $name = $sub->getName();
@@ -34,7 +38,7 @@ readonly class PushSubService
             $push->sendOneNotification($subscription, json_encode([
                 'title' => 'Шарики-чат',
                 'body' => $message,
-                'url' => 'https://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai/',
+                'url' => $server->getPushUrl(),
             ]));
         }
     }

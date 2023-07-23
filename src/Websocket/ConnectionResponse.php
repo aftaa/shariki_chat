@@ -2,7 +2,6 @@
 
 namespace App\Websocket;
 
-use App\Message\ChatMessage;
 use App\Message\ChatMessages;
 use App\Message\Message;
 use App\Message\SessionMessages;
@@ -16,12 +15,12 @@ final class ConnectionResponse
         $connection->send($response);
     }
 
-    public function sendSessions(ConnectionInterface $connection, SessionMessages $sessionsMessage): void
+    public function sendSessions(ConnectionInterface $connection, SessionMessages $sessionMessages): void
     {
-        foreach ($sessionsMessage->sessions as $session) {
+        foreach ($sessionMessages as $sessionMessage) {
             $message = new Message(
                 'operator_get_session',
-                $session,
+                $sessionMessage,
             );
             $this->sendMessage($connection, $message);
         }
@@ -29,7 +28,7 @@ final class ConnectionResponse
 
     public function sendChats(ConnectionInterface $connection, ChatMessages $chatMessages): void
     {
-        foreach ($chatMessages->chats as $chatMessage) {
+        foreach ($chatMessages as $chatMessage) {
             $message = new Message(
                 'operator_get_chat',
                 $chatMessage,

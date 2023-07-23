@@ -19,6 +19,9 @@ class Server
     #[ORM\Column]
     private ?bool $active = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $push_url = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +47,18 @@ class Server
     public function setActive(bool $active): static
     {
         $this->active = $active;
+
+        return $this;
+    }
+
+    public function getPushUrl(): ?string
+    {
+        return $this->push_url;
+    }
+
+    public function setPushUrl(string $push_url): static
+    {
+        $this->push_url = $push_url;
 
         return $this;
     }

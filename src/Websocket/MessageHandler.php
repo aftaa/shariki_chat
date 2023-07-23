@@ -4,26 +4,19 @@ namespace App\Websocket;
 
 use App\Handler\Handler;
 use App\Handler\HandlerException;
-use App\Handler\OperatorFactory;
 use App\Message\ChatMessages;
 use App\Message\Message;
 use App\Message\SessionMessages;
-use App\Service\ChatService;
-use App\Service\DateService;
-use App\Service\OperatorManager;
-use App\Service\PushSubService;
-use App\Service\SessionService;
+use App\Service\ConnectionService;
+use App\Service\SessionConnectionService;
 use Exception;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
 
 class MessageHandler implements MessageComponentInterface
 {
-    use MessageHandlerTrait;
-
     private OutputInterface $output;
 
     /**
@@ -32,23 +25,14 @@ class MessageHandler implements MessageComponentInterface
     private array $sessions = [];
 
     public function __construct(
-        private readonly ChatService        $chatManager,
-        private readonly SessionService     $sessionService,
-        private readonly MailerInterface    $mailer,
-        private readonly PushSubService     $pushManager,
-        private readonly Handler            $handler,
-        private readonly ConnectionResponse $handlerResponse,
-        private ConnectionManager           $operatorConnections = new ConnectionManager(),
-        private SessionManager              $sessionsConnections = new SessionManager(),
-        private DateService                 $chatDateManager = new DateService(),
+        private readonly Handler                  $handler,
+        private readonly ConnectionResponse       $handlerResponse,
+        private readonly ConnectionService        $operatorConnections,
+        private readonly SessionConnectionService $sessionsConnections,
     )
     {
     }
 
-    /**
-     * @param OutputInterface $output
-     * @return $this
-     */
     public function setOutput(OutputInterface $output): static
     {
         $this->output = $output;
@@ -60,11 +44,11 @@ class MessageHandler implements MessageComponentInterface
         $queryString = $conn->httpRequest->getUri()->getQuery();
         parse_str($queryString, $params);
         if (array_key_exists('operator', $params)) {
-            $this->output->writeln('[ OPERATOR ]');
+            $this->output->writeln('[ open operator ]');
             $this->operatorConnections->add($conn);
         }
         if (array_key_exists('session', $params)) {
-            $this->output->writeln("[ SESSION $params[session] ]");
+            $this->output->writeln("[ open session $params[session] ]");
             $this->sessionsConnections->add($params['session'], $conn);
         }
     }
@@ -79,14 +63,18 @@ class MessageHandler implements MessageComponentInterface
 
             try {
                 // обработка команды
-                $messageContent = $this->handler->build($message->getCommand())->handle($message);
+                $messageContent = $this->handler
+                    ->build($message->getCommand())
+                    ->setOperatorConnections($this->operatorConnections)
+                    ->setSessionsConnections($this->sessionsConnections)
+                    ->handle($message);
 
                 // отправка ответа
                 if ($messageContent instanceof ChatMessages) {
                     $this->handlerResponse->sendChats($from, $messageContent);
                 } elseif ($messageContent instanceof SessionMessages) {
                     $this->handlerResponse->sendSessions($from, $messageContent);
-                } else {
+                } elseif (!empty($messageContent)) {
                     $this->handlerResponse->sendMessage($from, new Message(
                         $message->getCommand(),
                         $messageContent,
@@ -97,20 +85,11 @@ class MessageHandler implements MessageComponentInterface
                 $this->output->writeln($messageHandlerFactoryException->getMessage());
 
                 switch ($message->getCommand()) {
-                    case 'add_op_message':
-                        $this->operatorAddMessage($from, $msg);
-                        break;
-                    case 'get_sessions':
-                        $this->operatorGetSessions($from);
-                        break;
                     case 'get_history':
-                        $this->getHistory($message, $from);
-                        break;
-                    case 'get_op_history':
-                        $this->operatorGetHistory($message, $from);
+                        //$this->getHistory($message, $from);
                         break;
                     case 'add_message':
-                        $this->addMessage($message, $from, $msg);
+                        //$this->addMessage($message, $from, $msg);
                         break;
                 }
             }

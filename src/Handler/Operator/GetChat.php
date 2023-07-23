@@ -26,7 +26,7 @@ class GetChat extends Handler
                 isOperator: $chat->isIsOperator(),
                 created: $this->dateService->format($chat->getCreated()),
             );
-            $chatMessages->chats[] = $chatMessage;
+            $chatMessages[] = $chatMessage;
         }
         return $chatMessages;
     }

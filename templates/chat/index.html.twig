@@ -5,49 +5,10 @@
 {% block body %}
     <link rel="stylesheet" type="text/css" href="{{ asset('css/chat.new.css') }}?t={{ 'now'|date('U') }}">
 
-    <header>
-        <div id="status"></div>
-        <div>
-            <select id="work-mode" disabled>
-                <option>Бот</option>
-                <option>Оператор</option>
-            </select>
-        </div>
-    </header>
-
     <main>
-
     </main>
 
-    <footer>
-        <div class="session">
-            <div class="archive">
-                <img alt="Архивировать" src="/images/archive.png">
-            </div>
-            <div class="open">
-                <span>Сообщений: <span class="message-count"></span></span> |
-                <span>Последнее: <span class="last-message"></span></span> |
-                <span>Чат начат: <span class="started"></span></span>
-            </div>
-
-            <div class="chat">
-                <div class="messages">
-                    <div class="message visitor">
-                        <div class="datetime"></div>
-                        <div class="text"></div>
-                    </div>
-                    <div class="message operator">
-                        <div class="datetime"></div>
-                        <div class="text"></div>
-                    </div>
-                </div>
-                <div class="form">
-                    <input type="text">
-                    <button>&gt;</button>
-                </div>
-            </div>
-        </div>
-    </footer>
+    {% include 'chat/_footer.html.twig' %}
 
     <script>
         let socket;
@@ -57,35 +18,23 @@
     <script>let url = '{{ server.url }}?operator=1';</script>
 
     <script>
-        function command(command) {
-            command = JSON.stringify(command);
-            socket.send(command);
-        }
-
         function connect() {
             socket = new WebSocket(url);
             socket.onopen = function () {
                 setStatus(true);
-                command({command: 'get_work_mode'});
-                command({command: 'get_sessions'});
+                command({command: 'operator_get_sessions', skip: true});
             }
             socket.onmessage = function (event) {
                 let message = JSON.parse(event.data);
                 switch (message.command) {
-                    case 'work_mode':
-                        setWorkMode(message.work_mode);
+                    case 'operator_get_session':
+                        drawSession(message.content);
                         break;
-                    case 'session':
-                        drawSession(message.session);
+                    case 'operator_get_chat':
+                        drawMessage(message.content);
                         break;
-                    case 'new_message':
-                        drawMessage(message);
-                        break;
-                    case 'new_session':
-                        drawSession(message.session, true);
-                        break;
-                    case 'upd_session':
-                        updateSession(message);
+                    case 'operator_update_session':
+                        updateSession(message.content);
                         break;
                 }
             }
@@ -100,155 +49,14 @@
         }
 
         connect();
-
-        setInterval(() => command({command: 'ping'}), 23000);
-
-        function setWorkMode(workMode) {
-            let select = document.getElementById('work-mode');
-            switch (workMode) {
-                case 'bot':
-                    select.selectedIndex = 0;
-                    break;
-                case 'operator':
-                    select.selectedIndex = 1;
-            }
-            $(select).show();
-        }
-
-        $('#work-mode').on('change', function () {
-            let workMode;
-            switch (this.selectedIndex) {
-                case 0:
-                    workMode = 'bot';
-                    break;
-                case 1:
-                    workMode = 'operator';
-            }
-            command({
-                command: 'set_work_mode',
-                work_mode: workMode
-            });
-        })
-
-        function setStatus(connected) {
-            status = connected;
-            if (connected) {
-                $('#status').addClass('connected');
-            } else {
-                $('#status').removeClass('connected');
-            }
-        }
-
+        setInterval(() => command({command: 'client_ping'}), 30000);
         setInterval(function () {
             if (!status) {
                 connect();
             }
         }, 10000);
 
-        function drawSession(session, prepend) {
-            let $div = $('footer .session').clone(true, true);
-            $div.attr('id', 'session-' + session.name);
-
-            $('.open', $div).attr('data-session', session.name);
-            $('.archive', $div).attr('data-session', session.name);
-            $('.message-count', $div).html(session.message_count);
-            $('.last-message', $div).html(session.last_message);
-            $('.started', $div).html(session.started);
-            $('.chat', $div).attr('id', 'chat-' + session.name).hide();
-            $('.messages', $div).attr('id', 'messages-' + session.name).html('');
-            $('input, button', $div).attr('data-session', session.name);
-            $('input', $div).attr('id', 'text-' + session.name);
-            if (session.has_new_message) {
-                $div.addClass('new-message');
-            }
-            if (!prepend) {
-                $('main').append($div);
-            } else {
-                $('main').prepend($div);
-            }
-        }
-
-        $('.archive').on('click', function (event) {
-        })
-
-        $('.session .open').on('click', function () {
-            $('#messages-' + this.dataset.session).html('');
-            command({
-                command: 'get_op_history',
-                session: this.dataset.session
-            });
-            $('.chat').hide();
-            $('#chat-' + this.dataset.session).show();
-            $('#session-' + this.dataset.session).removeClass('new-message');
-        })
-
-        function drawMessage(message) {
-            if ('none' !== $('#chat-' + message.session).css('display')) {
-                let $messages = $('#messages-' + message.session);
-                let $message = $('footer ' + (message.isOperator ? '.operator' : '.visitor')).clone();
-                $('.text', $message).html(message.message);
-                $('.datetime', $message).html(message.created);
-                $messages.append($message);
-                scrollToBottom(message.session);
-            } else {
-                $('#session-' + message.session).addClass('new-message').prependTo('main');
-            }
-        }
-
-        function scrollToBottom(session) {
-            let chatMessages = document.getElementById("messages-" + session);
-            if (chatMessages) {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
-
-        $('button').on('click', function () {
-            let session = this.dataset.session;
-            let text = $('#text-' + session).val();
-            if ($.trim(text)) {
-                sendMessage(session, text);
-                $('#text-' + session).val('')
-            }
-        })
-
-        $('input').on('keypress', function (event) {
-            if (13 === event.keyCode) {
-                let session = this.dataset.session;
-                let text = this.value;
-                if ($.trim(text)) {
-                    sendMessage(session, text);
-                    this.value = '';
-                }
-            }
-        })
-
-        function sendMessage(session, text) {
-            command({
-                command: 'add_op_message',
-                session: session,
-                message: text,
-                name: 'Оператор',
-                isOperator: true
-            });
-
-            if ($('main .session:first').attr('id') !== 'session-' + session) {
-                $('#session-' + session).prependTo('main');
-            }
-        }
-
-        function updateSession(message) {
-            let $div = $('#session-' + message.session.session);
-            if ($div.length) {
-                $('.message-count', $div).html(message.session.message_count);
-                $('.last-message', $div).html(message.session.last_message);
-            } else {
-                drawSession(message.session, true);
-            }
-        }
-
-        let width = $('.messages').width();
-        $('.form input').width(width - 42);
-        $('footer').hide();
+        {% include 'chat/_script.js' %}
     </script>
 
     <script>
@@ -292,6 +100,7 @@
                     );
                 });
         }
+
         regWorker('test');
     </script>
 {% endblock %}
