@@ -61,6 +61,7 @@ setInterval(function () {
 
 $('#work-mode-select').on('change', function () {
     let work_mode = $('option:selected', this).val();
+    console.log(work_mode);
     let message = {
         command: 'operator_set_work_mode',
         content: {
