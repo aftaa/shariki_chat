@@ -46,8 +46,8 @@ class AddMessage extends Handler
         $this->sessionsConnections->send($session->getName(), $msg);
         $this->operatorConnections->send($msg);
 
-//        $this->pushSubService->webPushSend($chat->getMessage());
-//        $this->sendMail($chat);
+        $this->pushSubService->webPushSend($chat->getMessage());
+        $this->sendMail($chat);
 
         if ('bot' === $this->workModeService->get()) {
             $chatMessage = new ChatMessage(
