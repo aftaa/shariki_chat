@@ -84,7 +84,6 @@ class AddMessage extends Handler
         $email = (new Email())
             ->from(new Address($_ENV['EMAIL_FROM_ADDRESS'], $_ENV['EMAIL_FROM_NAME']))
             ->addTo($_ENV['EMAIL_TO'])
-            ->bcc($_ENV['EMAIL_BCC'])
             ->subject('Чат: ' . $chat->getMessage())
             ->text($chat->getMessage());
         $this->mailer->send($email);
