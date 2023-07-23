@@ -7,6 +7,7 @@ use App\Handler\Handler as HandlerAlias;
 use App\Message\ChatMessage;
 use App\Message\Message;
 use DateTime;
+use stdClass;
 
 class GetChat extends HandlerAlias
 {
@@ -53,5 +54,7 @@ class GetChat extends HandlerAlias
             $msg = json_encode($answer);
             $this->sessionsConnections->send($session->getName(), $msg);
         }
+
+        return new stdClass();
     }
 }
