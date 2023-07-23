@@ -24,7 +24,7 @@ function drawSession(session, prepend) {
     $('.messages', $div).attr('id', 'messages-' + session.name).html('');
     $('input, button', $div).attr('data-session', session.name);
     $('input', $div).attr('id', 'text-' + session.name);
-    if (session.has_operaror_get_chat) {
+    if (session.has_operator_get_chat) {
         $div.addClass('new-message');
     }
     if (!prepend) {
@@ -80,7 +80,7 @@ $(function () {
     $('.session .open').on('click', function () {
         $('#messages-' + this.dataset.session).html('');
         command({
-            command: 'operaror_get_chat',
+            command: 'operator_get_chat',
             session: this.dataset.session
         });
         $('.chat').hide();

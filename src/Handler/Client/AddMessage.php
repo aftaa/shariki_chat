@@ -32,7 +32,7 @@ class AddMessage extends Handler
         $this->chatService->add($chat);
 
         $message = new Message(
-            'operaror_get_chat',
+            'operator_get_chat',
             new ChatMessage(
                 $session->getName(),
                 $chat->getName(),
@@ -64,7 +64,7 @@ class AddMessage extends Handler
                 true,
                 $this->dateService->format(new DateTime()),
             );
-            $message = new Message('operaror_get_chat', $chatMessage);
+            $message = new Message('operator_get_chat', $chatMessage);
             $msg = json_encode($message);
             $this->operatorConnections->send($msg);
             $this->sessionsConnections->send($session->getName(), $msg);
