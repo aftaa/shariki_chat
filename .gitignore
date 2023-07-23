@@ -1,3 +1,4 @@
+.htpasswd
 /etc/logs
 
 ###> symfony/framework-bundle ###
