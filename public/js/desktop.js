@@ -27,6 +27,7 @@ function connect() {
             case 'operator_get_work_mode':
                 let work_mode = message.content.work_mode;
                 let select = document.getElementById('work-mode-select');
+                console.log([work_mode, select]);
                 switch (work_mode) {
                     case 'bot':
                         select.selectedIndex = 0;
