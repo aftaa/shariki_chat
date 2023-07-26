@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\ServerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,6 +15,12 @@ class ChatController extends AbstractController
         private ServerService $serverService,
     )
     {
+    }
+
+    #[Route('/new')]
+    public function new(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_chat');
     }
 
     #[Route('/chat', name: 'app_chat')]
