@@ -23,6 +23,12 @@ class ChatController extends AbstractController
         return $this->redirectToRoute('app_chat');
     }
 
+    #[Route('/all')]
+    public function all(): RedirectResponse
+    {
+        return $this->redirectToRoute('app_archive');
+    }
+
     #[Route('/chat', name: 'app_chat')]
     public function chat(Request $request): Response
     {
