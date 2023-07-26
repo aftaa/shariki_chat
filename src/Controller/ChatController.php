@@ -17,7 +17,7 @@ class ChatController extends AbstractController
     {
     }
 
-    #[Route('/new')]
+    #[Route('/mobile')]
     public function new(): RedirectResponse
     {
         return $this->redirectToRoute('app_chat');
