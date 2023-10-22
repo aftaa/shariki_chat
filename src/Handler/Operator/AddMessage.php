@@ -20,7 +20,12 @@ class AddMessage extends Handler
         $chat = new Chat();
         $chat->setSession($session);
         $chat->setName($message->getContent()->name);
-        $chat->setMessage($message->getContent()->message);
+        $message1 = preg_replace(
+            "/(([a-z]+:\/\/)?(?:[a-zа-я0-9@:_-]+\.)+[a-zа-я0-9]{2,4}(?(2)|\/).*?)([-.,:]?(?:\\s|\$))/is",
+            '<a href="\1" target="_blank">\1</a>',
+            $message->getContent()->message
+        );
+        $chat->setMessage($message1);
         $chat->setIsOperator($message->getContent()->isOperator);
         $chat->setCreated(new DateTime());
         $this->chatService->add($chat);
