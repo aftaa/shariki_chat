@@ -1,22 +1,20 @@
 <?php
 
-namespace App\Handler\Operator;
+namespace App\Handler\Client;
 
 use App\Handler\Handler;
 use App\Message\Message;
 
 class KeyPress extends Handler
 {
-    /**
-     * @throws \Exception
-     */
     public function handle(Message $message): object
     {
         $session = $message->getContent()->session;
         $message = json_encode((object)[
-            'command' => 'operator_key_press',
+            'command' => 'client_key_press',
+            'session' => $session,
         ]);
-        $this->sessionsConnections->send($session, $message);
+        $this->operatorConnections->send($message);
         return (object)[];
     }
 }

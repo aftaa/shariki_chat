@@ -37,6 +37,9 @@
                     case 'operator_update_session':
                         updateSession(message.content);
                         break;
+                    case 'client_key_press':
+                        clientKeyPress(message);
+                        break;
                 }
             }
             socket.onerror = function (event) {

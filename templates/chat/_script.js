@@ -74,7 +74,6 @@ function sendKeyPress(session) {
         session: session,
         isOperator: true
     };
-    console.log(answer);
     command(answer);
 }
 
@@ -83,6 +82,16 @@ function updateSession(message) {
     if ($div.length) {
         $('.message-count', $div).html(message.message_count);
         $('.last-message', $div).html(message.last_message);
+    }
+}
+
+function clientKeyPress(message) {
+    let $div = $('#session-' + message.session);
+    if ($div.length) {
+        $('.printing', $div).show();
+        setTimeout(() => {
+            $('.printing', $div).hide();
+        }, 500);
     }
 }
 
