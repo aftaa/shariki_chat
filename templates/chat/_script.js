@@ -68,6 +68,16 @@ function sendMessage(session, text) {
     }
 }
 
+function sendKeyPress(session) {
+    let answer = {
+        command: 'operator_key_press',
+        session: session,
+        isOperator: true
+    };
+    console.log(answer);
+    command(answer);
+}
+
 function updateSession(message) {
     let $div = $('#session-' + message.session);
     if ($div.length) {
@@ -98,13 +108,15 @@ $(function () {
     })
 
     $('input').on('keypress', function (event) {
+        let session = this.dataset.session;
         if (13 === event.keyCode) {
-            let session = this.dataset.session;
             let text = this.value;
             if ($.trim(text)) {
                 sendMessage(session, text);
                 this.value = '';
             }
+        } else if (27 !== event.keyCode) {
+            sendKeyPress(session);
         }
     })
 
