@@ -66,6 +66,12 @@ class Chat
 
     public function setMessage(string $message): self
     {
+        $message = preg_replace(
+            "/(([a-z]+:\/\/)?(?:[a-zа-я0-9@:_-]+\.)+[a-zа-я0-9]{2,4}(?(2)|\/).*?)([-.,:]?(?:\\s|\$))/is",
+            '<a href="\1" target="_blank">\1</a>',
+            htmlspecialchars($message)
+        );
+
         $this->message = $message;
 
         return $this;
