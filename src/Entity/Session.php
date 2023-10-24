@@ -28,6 +28,9 @@ class Session
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Chat::class)]
     private Collection $chats;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $last_ping = null;
+
     public function __construct()
     {
         $this->chats = new ArrayCollection();
@@ -107,5 +110,17 @@ class Session
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function getLastPing(): ?\DateTimeInterface
+    {
+        return $this->last_ping;
+    }
+
+    public function setLastPing(?\DateTimeInterface $last_ping): static
+    {
+        $this->last_ping = $last_ping;
+
+        return $this;
     }
 }
