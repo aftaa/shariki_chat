@@ -5,14 +5,13 @@ namespace App\Controller;
 use App\Service\ServerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ChatController extends AbstractController
 {
     public function __construct(
-        private ServerService $serverService,
+        private readonly ServerService $serverService,
     )
     {
     }
@@ -30,7 +29,7 @@ class ChatController extends AbstractController
     }
 
     #[Route('/chat', name: 'app_chat')]
-    public function chat(Request $request): Response
+    public function chat(): Response
     {
         return $this->render('chat/index.html.twig', [
             'server' => $this->serverService->get(),
@@ -38,9 +37,17 @@ class ChatController extends AbstractController
     }
 
     #[Route('/archive', name: 'app_archive')]
-    public function archive(Request $request): Response
+    public function archive(): Response
     {
         return $this->render('chat/archive.html.twig', [
+            'server' => $this->serverService->get(),
+        ]);
+    }
+
+    #[Route('/recent', name: 'app_recent')]
+    public function recent(): Response
+    {
+        return $this->render('chat/recent.html.twig', [
             'server' => $this->serverService->get(),
         ]);
     }

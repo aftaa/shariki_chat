@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Чаты{% endblock %}
+
+{% block body %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/chat.all.css') }}?t={{ 'now'|date('U') }}">
+
+    <main>
+    </main>
+
+    {% include 'chat/_footer.html.twig' %}
+
+    <script>
+        let socket;
+        let status = false;
+    </script>
+
+    <script>let url = '{{ server.url }}?operator=1';</script>
+
+    <script>
+        function connect() {
+            socket = new WebSocket(url);
+            socket.onopen = function () {
+                setStatus(true);
+                command({command: 'operator_get_sessions'});
+            }
+            socket.onmessage = function (event) {
+                let message = JSON.parse(event.data);
+                switch (message.command) {
+                    case 'operator_get_session':
+                        if (message.content.message_count > 1) {
+                            drawSession(message.content);
+                        }
+                        break;
+                    case 'operator_get_chat':
+                        drawMessage(message.content);
+                        break;
+                    case 'operator_update_session':
+                        updateSession(message.content);
+                        break;
+                }
+            }
+            socket.onerror = function (event) {
+                setStatus(false);
+                $('main').html('');
+            }
+            socket.onclose = function (event) {
+                setStatus(false);
+                $('main').html('');
+            }
+        }
+
+        connect();
+        setInterval(() => command({command: 'client_ping'}), 30000);
+        setInterval(function () {
+            if (!status) {
+                connect();
+            }
+        }, 10000);
+
+        {% include 'chat/_script.js' %}
+    </script>
+{% endblock %}
