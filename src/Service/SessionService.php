@@ -52,7 +52,7 @@ class SessionService
         $session = $this->sessionRepository->findOneBy(['name' => $sessionName]);
         if ($session) {
             $session->setLastPing(new \DateTime());
-            $this->sessionRepository->save($sessionName, true);
+            $this->sessionRepository->save($session, true);
         }
     }
 }
