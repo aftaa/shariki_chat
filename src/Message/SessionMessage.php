@@ -12,6 +12,7 @@ class SessionMessage
         public int $message_count,
         public bool $has_operator_get_chat,
         public bool $hidden,
+        public string $last_ping,
     )
     {
     }

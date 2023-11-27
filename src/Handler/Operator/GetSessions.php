@@ -34,6 +34,7 @@ class GetSessions extends Handler
                 $session['message_count'],
                 (bool)$session['has_operator_get_chat'],
                 (bool)!$session['has_operator_get_chat1'] && 1 == $session['message_count'],
+                $this->dateService->format($session['last_ping']),
             );
             $sessionMessages[] = $sessionMessage;
         }

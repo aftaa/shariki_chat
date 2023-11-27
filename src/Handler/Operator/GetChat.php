@@ -25,7 +25,6 @@ class GetChat extends Handler
                 message: $chat->getMessage(),
                 isOperator: $chat->isIsOperator(),
                 created: $this->dateService->format($chat->getCreated()),
-                lastPing: $this->dateService->format($session->getLastPing()),
             );
             $chatMessages[] = $chatMessage;
         }
