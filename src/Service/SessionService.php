@@ -46,4 +46,13 @@ class SessionService
         }
         return $session;
     }
+
+    public function setLastPing(string $sessionName): void
+    {
+        $session = $this->sessionRepository->findOneBy(['name' => $sessionName]);
+        if ($session) {
+            $session->setLastPing(new \DateTime());
+            $this->sessionRepository->save($sessionName, true);
+        }
+    }
 }

@@ -9,9 +9,8 @@ class Ping extends Handler
 {
     public function handle(Message $sessionMessage): object
     {
-        echo "ping\n";
-        echo $sessionMessage->getContent()->session, "\n\n";
-        $this->workModeService->get('timeout');
+        $sessionName = $sessionMessage->getContent()->session;
+        $session = $this->sessionService->setLastPing($sessionName);
         return parent::handle($sessionMessage);
     }
 }
