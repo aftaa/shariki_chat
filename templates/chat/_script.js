@@ -82,6 +82,7 @@ function updateSession(message) {
     if ($div.length) {
         $('.message-count', $div).html(message.message_count);
         $('.last-message', $div).html(message.last_message);
+        $('.last-ping', $div).html(message.lastPing);
     }
 }
 
