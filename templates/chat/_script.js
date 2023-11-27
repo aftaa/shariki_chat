@@ -20,6 +20,7 @@ function drawSession(session, prepend) {
     $('.message-count', $div).html(session.message_count);
     $('.last-message', $div).html(session.last_message);
     $('.started', $div).html(session.started);
+    $('.last-ping', $div).html(session.last_ping);
     $('.chat', $div).attr('id', 'chat-' + session.name).hide();
     $('.messages', $div).attr('id', 'messages-' + session.name).html('');
     $('input, button', $div).attr('data-session', session.name);
