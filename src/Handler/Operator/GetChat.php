@@ -20,11 +20,12 @@ class GetChat extends Handler
         $chatMessages = new ChatMessages();
         foreach ($chats as $chat) {
             $chatMessage = new ChatMessage(
+                session: (string)$chat->getSession(),
                 name: $chat->getName(),
                 message: $chat->getMessage(),
-                session: (string)$chat->getSession(),
                 isOperator: $chat->isIsOperator(),
                 created: $this->dateService->format($chat->getCreated()),
+                lastPing: $this->dateService->format($session->getLastPing()),
             );
             $chatMessages[] = $chatMessage;
         }

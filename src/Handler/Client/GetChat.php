@@ -30,6 +30,7 @@ class GetChat extends HandlerAlias
                     $chat->getMessage(),
                     $chat->isIsOperator(),
                     $this->dateService->format($chat->getCreated()),
+                    $this->dateService->format($session->getLastPing()),
                 );
                 $message = new Message(
                     'client_get_chat',
@@ -44,7 +45,8 @@ class GetChat extends HandlerAlias
                 name: 'Чат-бот',
                 message: $this->messageService->get('welcome'),
                 isOperator: true,
-                created: $this->dateService->format(new DateTime())
+                created: $this->dateService->format(new DateTime()),
+                lastPing: $this->dateService->format($session->getLastPing()),
             );
 
             $chat = new Chat();

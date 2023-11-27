@@ -10,6 +10,7 @@ class ChatMessage
         public string $message,
         public bool $isOperator,
         public string $created,
+        public string $lastPing,
     )
     {
     }
