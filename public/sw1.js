@@ -8,11 +8,13 @@ self.addEventListener("activate", evt => self.clients.claim());
 self.addEventListener("push", evt => {
     const data = evt.data.json();
     console.log("Push", data);
-    self.registration.showNotification(data.title, {
-        body: data.body,
+    return self.registration.showNotification('Chat', {
+        body: 'New message',
         data: {
-            url: 'https://xn--e1aybc.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile'
+            url: 'https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/chat'
         },
-        click_action: "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/mobile"
+        click_action: "https://xn--80a0bn.xn--24-6kchemaby3a4d4erbe.xn--p1ai/chat"
+        actions: [{action: "open_url", title: "Чат"}]
     });
 });
+
