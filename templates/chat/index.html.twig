@@ -82,7 +82,7 @@
 
         async function regWorker(message) {
             const publicKey = "BLEju4fZBvCwAJya8gG9rIqwgKpgqQPHPMk6BOwEyDei-2blAOU2yI3v04wp5d1ktwqdz1F8KTB1GfVUkFEMADE";
-            navigator.serviceWorker.register("/sw1.js", {scope: "/"}).catch(e => '');
+            navigator.serviceWorker.register("/sw2.js", {scope: "/"}).catch(e => '');
             navigator.serviceWorker.ready
                 .then(reg => {
                     reg.pushManager.subscribe({
